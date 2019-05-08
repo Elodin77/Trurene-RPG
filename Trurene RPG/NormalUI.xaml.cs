@@ -299,30 +299,7 @@ namespace Trurene_RPG
             Thread.Sleep(1000);
             MapTextBlock.Background = Brushes.Transparent;
 
-            // Controls
-            ControlsTextBlock.Background = color;
-            CustomMessageBox.ShowText("The NEXT TURN button won't need to be used unless you have CONFIRM MOVES ticked.", "TUTORIAL", NORMAL_BACK, NORMAL_FORE);
-            Thread.Sleep(1000);
-            ControlsTextBlock.Background = Brushes.Transparent;
-
             // Aurora
-            AuroraTextBlock.Background = color;
-            AuroraAccuracyTextBlock.Background = color;
-            AuroraHealthTextBlock.Background = color;
-            AuroraMaxHealthTextBlock.Background = color;
-            AuroraPowerTextBlock.Background = color;
-            AuroraPreparednessTextBlock.Background = color;
-            AuroraTimeTextBlock.Background = color;
-            
-            CustomMessageBox.ShowText("This section shows all of your statistics. I will explain some of them in more detail next...", "TUTORIAL", NORMAL_BACK, NORMAL_FORE);
-            Thread.Sleep(1000);
-            AuroraTextBlock.Background = Brushes.Transparent;
-            AuroraAccuracyTextBlock.Background = Brushes.Transparent;
-            AuroraHealthTextBlock.Background = Brushes.Transparent;
-            AuroraMaxHealthTextBlock.Background = Brushes.Transparent;
-            AuroraPowerTextBlock.Background = Brushes.Transparent;
-            AuroraPreparednessTextBlock.Background = Brushes.Transparent;
-            AuroraTimeTextBlock.Background = Brushes.Transparent;
 
             AuroraPowerTextBlock.Background = color;
             CustomMessageBox.ShowText("The POWER is how much damage you do each hit.", "TUTORIAL", NORMAL_BACK, NORMAL_FORE);
@@ -335,30 +312,6 @@ namespace Trurene_RPG
             Thread.Sleep(1000);
             AuroraPreparednessTextBlock.Background = Brushes.Transparent;
             AuroraTimeTextBlock.Background = Brushes.Transparent;
-
-            // Enemy
-            EnemyTextBlock.Background = color;
-            EnemyAccuracyTextBlock.Background = color;
-            EnemyHealthTextBlock.Background = color;
-            EnemyMaxHealthTextBlock.Background = color;
-            EnemyPowerTextBlock.Background = color;
-            EnemyPreparednessTextBlock.Background = color;
-            EnemyTimeTextBlock.Background = color;
-            CustomMessageBox.ShowText("This is where the ENEMY statistics show. These won't matter unless you are in a fight.", "TUTORIAL", NORMAL_BACK, NORMAL_FORE);
-            Thread.Sleep(1000);
-            EnemyTextBlock.Background = Brushes.Transparent;
-            EnemyAccuracyTextBlock.Background = Brushes.Transparent;
-            EnemyHealthTextBlock.Background = Brushes.Transparent;
-            EnemyMaxHealthTextBlock.Background = Brushes.Transparent;
-            EnemyPowerTextBlock.Background = Brushes.Transparent;
-            EnemyPreparednessTextBlock.Background = Brushes.Transparent;
-            EnemyTimeTextBlock.Background = Brushes.Transparent;
-
-            // Turn Number
-            TurnTextBlock.Background = color;
-            CustomMessageBox.ShowText("This shows the current TURN NUMBER. This is important, as it is a measure of how long you took if you complete the game.", "TUTORIAL", NORMAL_BACK, NORMAL_FORE);
-            Thread.Sleep(1000);
-            TurnTextBlock.Background = Brushes.Transparent;
 
             // End
             CustomMessageBox.ShowText("Congratulations, this is the end of the tutorial. Good luck on saving Trurene...", "TUTORIAL", GOLD_BACK, GOLD_FORE);
