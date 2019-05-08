@@ -9,7 +9,7 @@
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"   
   Title="Trurene - The RPG" Height="600" Width="800"
   WindowStyle="SingleBorderWindow" ResizeMode="CanResizeWithGrip"  
-  WindowStartupLocation="CenterScreen" WindowState="Maximized" KeyDown="KeyDownHandler">
+  WindowStartupLocation="CenterScreen" WindowState="Maximized" KeyDown="KeyDownHandler" Closing="OnShutdown">
 
     <Grid TextBlock.FontSize="15" TextBlock.FontFamily="Comic Sans MS">
         <!-- First the grid is defined.-->

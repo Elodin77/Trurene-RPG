@@ -27,26 +27,32 @@ namespace Trurene_RPG
     /// </summary>
     public partial class NormalUI : Window
     {
+        // GLOBAL VARIABLES
+        public static System.Timers.Timer UpdateEverythingTimer;
+        public static System.Timers.Timer SaveTimer;
+        public static System.Timers.Timer PrepareTimer;
+        public static System.Timers.Timer UpdateNotificationsTimer;
+        // FUNCTIONS
         public NormalUI()
         {
 
             // Start the timer to continually update the UI
-            System.Timers.Timer UpdateEverythingTimer = new System.Timers.Timer();
+            UpdateEverythingTimer = new System.Timers.Timer();
             UpdateEverythingTimer.Elapsed += new ElapsedEventHandler(UpdateEverything);
             UpdateEverythingTimer.Interval = 500; // this is a very costly function to run, so it has a reasonable time interval
             UpdateEverythingTimer.Enabled = true;
             // Start the timer to autosave
-            System.Timers.Timer SaveTimer = new System.Timers.Timer();
+            SaveTimer = new System.Timers.Timer();
             SaveTimer.Elapsed += new ElapsedEventHandler(AutoSave);
             SaveTimer.Interval = 60000; // every minute 
             SaveTimer.Enabled = true;
             // Start the timer to autoprepare
-            System.Timers.Timer PrepareTimer = new System.Timers.Timer();
+            PrepareTimer = new System.Timers.Timer();
             PrepareTimer.Elapsed += new ElapsedEventHandler(AutoPrepare);
-            PrepareTimer.Interval = 500; 
+            PrepareTimer.Interval = 1000; 
             PrepareTimer.Enabled = true;
             // Start the timer to update notifications
-            System.Timers.Timer UpdateNotificationsTimer = new System.Timers.Timer();
+            UpdateNotificationsTimer = new System.Timers.Timer();
             UpdateNotificationsTimer.Elapsed += new ElapsedEventHandler(UpdateNotifications);
             UpdateNotificationsTimer.Interval = 500; 
             UpdateNotificationsTimer.Enabled = true;
@@ -254,12 +260,12 @@ namespace Trurene_RPG
 
                         if (Program.auroraPreparedness < Program.world.aurora.attack[2])
                         {
-                            StrikeButton.Content = "Prepare";
+                            StrikeButton.Content = "PREPARE";
                             StrikeButton.Background = Brushes.OrangeRed;
                         }
                         else
                         {
-                            StrikeButton.Content = "Strike";
+                            StrikeButton.Content = "STRIKE";
                             StrikeButton.Background = Brushes.LightGreen;
                         }
                     }
@@ -379,6 +385,15 @@ namespace Trurene_RPG
                 Program.notificationsQueue = new List<Program.FormattedText>(); // Empty the queue
                 notificationsRTF.ScrollToEnd(); // scroll to the bottom
             });
+        }
+        public void OnShutdown(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            /* This function stops all of the threads, timers... to prevent any exceptions occuring by the tasks being cancelled.
+             */
+            PrepareTimer.Stop();
+            SaveTimer.Stop();
+            UpdateEverythingTimer.Stop();
+            UpdateNotificationsTimer.Stop();
         }
 
 
