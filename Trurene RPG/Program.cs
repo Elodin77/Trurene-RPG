@@ -35,11 +35,6 @@ using System.Windows.Media;
 using System.Linq;
 using System.Windows.Forms;
 using static Trurene_RPG.Constants;
-
-using System.Runtime.InteropServices;
-using System.Diagnostics;
-using System.Windows.Threading;
-using Console = Colorful.Console;
 using System.Media;
 using System.Windows.Documents;
 using Brushes = System.Windows.Media.Brushes;
@@ -180,6 +175,8 @@ namespace Trurene_RPG
             FlushKeyboard();
             Console.ReadKey();
             Console.Clear();
+
+            UnitTesting.RunUnitTesting(); // Run the testing
 
             Console.WriteLine("Please turn on sound for the best experience.");
             Thread.Sleep(2000);
