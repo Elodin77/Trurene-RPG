@@ -51,7 +51,7 @@ namespace Trurene_RPG
 
         // MAIN //
         [STAThread] // Marks function as a Standard Thread Apartment
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             /* This is the main function. It does not actually run the game or coordinate
              * the other functions related to the game. But it has the code for the very start
@@ -195,7 +195,7 @@ namespace Trurene_RPG
             if (world.aurora.health <= 0)
             {
                 PlaySound("die.wav", 1.0);
-                
+                Console.WriteLine("Keep trying. Keep an eye on your health.");
             }
             else if (world.trollKing.health <= 0)
             {
@@ -205,7 +205,7 @@ namespace Trurene_RPG
             }
             else
             {
-                Console.WriteLine("Keep trying. I'm sure you'll defeat the Troll King once and for all eventually.");
+                Console.WriteLine("Keep trying. Keep an eye on how many villages have been destroyed");
             }
             Console.WriteLine("Thank you for playing!");
             Thread.Sleep(3000);
@@ -213,352 +213,9 @@ namespace Trurene_RPG
             Console.WriteLine("\n\n\nPRESS ANY KEY TO CONTINUE");
             Console.ReadKey();
         }
-        public static void UpdateMapIcons()
-        {
-            EMPTY_ICON = Image.FromFile("data/resource packs/" + RESOURCE_PACK + "/empty-icon.png");
-            AURORA_ICON = Image.FromFile("data/resource packs/" + RESOURCE_PACK + "/aurora-icon.png");
-            TROLL_KING_ICON = Image.FromFile("data/resource packs/" + RESOURCE_PACK + "/troll-king-icon.png");
-            WOLVES_ICON = Image.FromFile("data/resource packs/" + RESOURCE_PACK + "/wolves-icon.png");
-            INTACT_VILLAGE_ICON = Image.FromFile("data/resource packs/" + RESOURCE_PACK + "/intact-village-icon.png");
-            DESTROYED_VILLAGE_ICON = Image.FromFile("data/resource packs/" + RESOURCE_PACK + "/destroyed-village-icon.png");
-            UNSOLVED_SHRINE_ICON = Image.FromFile("data/resource packs/" + RESOURCE_PACK + "/unsolved-shrine-icon.png");
-            SOLVED_SHRINE_ICON = Image.FromFile("data/resource packs/" + RESOURCE_PACK + "/solved-shrine-icon.png");
-            MAEJA_ICON = Image.FromFile("data/resource packs/" + RESOURCE_PACK + "/maeja-icon.png");
-            HAWK_ICON = Image.FromFile("data/resource packs/" + RESOURCE_PACK + "/hawk-icon.png");
-            QUEST_ICON = Image.FromFile("data/resource packs/" + RESOURCE_PACK + "/quest-icon.png");
-        }
-        public static void GenerateDefaultValues()
-        {
-            /* This function generates default values to allow the update timer to work with variables not actually created yet.
-             */
-            world.rows = 1;
-            world.cols = 1;
-            world.aurora.attack = new int[3];
-            world.aurora.attack[0] = 0;
-            world.aurora.attack[1] = 0;
-            world.aurora.attack[2] = 0;
-            world.aurora.health = 1;
-            world.aurora.maxHealth = 1;
-            world.trollKing.maxHealth = 1;
-            world.trollKing.health = 1;
-            world.wolves.maxHealth = 1;
-            world.wolves.health = 1;
-            world.turnNum = 0;
 
-
-        }
-        public static void NextTurn()
-        {
-            /* This is the function which is run for each turn. This function is run repeatedly to start each
-             * turn in the game. The user runs this function with a button, but anti-cheat methods are implemented
-             * to stop users exploiting the fact that they control when the turn "rolls over".
-             * 
-             * The functions which it does include:
-             * updating the world.
-             * showing any important messages to the user.
-             * moving Aurora (the player).
-             * doing any interactions important for fighting or villages.
-             * stopping the game if it is over.
-             * 
-             */
-            hawkOmniscience = false;
-            UpdateBackgroundMusic();
-            bool trollKingAlive = world.trollKing.health > 0;
-            bool auroraAlive = world.aurora.health > 0;
-            if (!(auroraAlive && trollKingAlive && world.villagePositions.Length > 0))
-            {
-                gameOver = true;
-                NormalUI.Shutdown();
-            }
-            else
-            {
-                if (fighting)
-                {
-                    fighting = DoFightTurn();
-                }
-                else
-                {
-                    world.turnNum += 1;
-                    UpdateWorld();
-                    DoMessages();
-                    MoveAurora();
-                    CalcTurnEvents();
-
-                }
-            }
-
-        }
-
-        public static ImageSource CalculateMap()
-        {
-            /* This function is responsible for creating the map. The map is actually one large
-                * picture, but this function gets each individual smaller image (icon) and essentially
-                * "squashes" the images together to make the larger map. This function is used every
-                * single turn to update what the map looks like.
-                */
-
-            List<List<Image>> map = new List<List<Image>>(world.rows);
-
-            // Create the empty world
-            for (int r = 0; r < world.rows; r++)
-            {
-                map.Add(new List<Image>(world.cols));  // Add images to list
-                for (int c = 0; c < world.cols; c++)
-                {
-                    map[r].Add(EMPTY_ICON); // Add images to list
-                }
-
-            }
-
-            try
-            {
-                // Add icons to the map
-                foreach (Position pos in world.villagePositions) // Add the intact villages
-                {
-                    map[pos.row][pos.col] = INTACT_VILLAGE_ICON;
-                }
-                foreach (Position pos in world.destroyedVillages) // Add the destroyed villages 
-                {
-                    if (pos.row != -1 && pos.col != -1) // Makes everything way easier by making a -1 -1 default first destroyed village (if nothing else is destroyed).
-                    {
-                        map[pos.row][pos.col] = DESTROYED_VILLAGE_ICON;
-                    }
-                }
-                foreach (Shrine shrine in world.shrines)
-                {
-                    if (shrine.solved == 0)
-                    {
-                        map[shrine.pos.row][shrine.pos.col] = UNSOLVED_SHRINE_ICON;
-                    }
-                    else
-                    {
-                        map[shrine.pos.row][shrine.pos.col] = SOLVED_SHRINE_ICON;
-                    }
-                }
-                map[world.aurora.pos.row][world.aurora.pos.col] = AURORA_ICON; // Add Aurora's icon
-                map[world.maejaPosition.row][world.maejaPosition.col] = MAEJA_ICON; // Add Maeja's icon
-                map[world.hawkPosition.row][world.hawkPosition.col] = HAWK_ICON; // Add Hawk's icon
-
-
-                if (world.spells[OMNISCIENCE_INDEX] == SPELL_LEARNT || hawkOmniscience) // Add Wolves and Troll King icons if Omniscience has been learnt or Hawk told her where they are
-                {
-                    map[world.wolves.pos.row][world.wolves.pos.col] = WOLVES_ICON;
-                    map[world.trollKing.pos.row][world.trollKing.pos.col] = TROLL_KING_ICON;
-
-
-                }
-                if (world.questPosition.row != -1 && world.questPosition.col != -1) // If there is a quest add its icon
-                {
-                    map[world.questPosition.row][world.questPosition.col] = QUEST_ICON;
-                }
-            }
-            catch { }
-
-
-
-            // your code
-            ImageSource source;
-            using (Bitmap bitmapMap = new Bitmap(world.rows * ICON_WIDTH, world.cols * ICON_HEIGHT)) // this is to prevent a memory leak
-            {
-                Graphics g = Graphics.FromImage(bitmapMap);
-                // Add images to the bitmap
-                for (int r = 0; r < world.rows; r++)
-                {
-                    for (int c = 0; c < world.cols; c++)
-                    {
-                        g.DrawImage(map[r][c], (c) * ICON_WIDTH, (r) * ICON_HEIGHT, ICON_WIDTH, ICON_HEIGHT);
-                    }
-                }
-                IntPtr hBitmap = bitmapMap.GetHbitmap();
-
-                try
-                {
-                    source = System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(hBitmap, IntPtr.Zero, Int32Rect.Empty, System.Windows.Media.Imaging.BitmapSizeOptions.FromEmptyOptions());
-                }
-                finally
-                {
-                    DeleteObject(hBitmap);
-                }
-            }
-            // Return the new ImageSource.
-            return source;
-
-        }
-        public static void Save(string filename)
-        {
-            /* This function writes all of the important values to a save file so that the user 
-             * can load it later to play the game. It is given a value for a filename.
-             */
-
-
-
-            // Create a string array 
-            string[] lines = new string[22];
-            lines[0] = Convert.ToString(world.rows) + " " + Convert.ToString(world.cols) + " " + Convert.ToString(world.turnNum) + " " + Convert.ToString(world.numVillages) + " " + Convert.ToString(world.numShrines);
-            lines[1] = Convert.ToString(world.hawkPosition.row) + " " + Convert.ToString(world.hawkPosition.col);
-            lines[2] = Convert.ToString(world.maejaPosition.row) + " " + Convert.ToString(world.maejaPosition.col);
-            lines[3] = Convert.ToString(world.questPosition.row) + " " + Convert.ToString(world.questPosition.col);
-            lines[4] = Convert.ToString(world.aurora.pos.row) + " " + Convert.ToString(world.aurora.pos.col);
-            lines[5] = Convert.ToString(world.aurora.health);
-            lines[6] = Convert.ToString(world.aurora.maxHealth);
-            lines[7] = Convert.ToString(world.aurora.attack[0]) + " " + Convert.ToString(world.aurora.attack[1]) + " " + Convert.ToString(world.aurora.attack[2]);
-            lines[8] = Convert.ToString(world.spells[0]) + " " + Convert.ToString(world.spells[1]) + " " + Convert.ToString(world.spells[2]) + " " + Convert.ToString(world.spells[3]);
-            lines[9] = Convert.ToString(world.gold);
-            lines[10] = Convert.ToString(world.trollKing.pos.row) + " " + Convert.ToString(world.trollKing.pos.col);
-            lines[11] = Convert.ToString(world.trollKing.health);
-            lines[12] = Convert.ToString(world.trollKing.maxHealth);
-            lines[13] = Convert.ToString(world.trollKing.attack[0]) + " " + Convert.ToString(world.trollKing.attack[1]) + " " + Convert.ToString(world.trollKing.attack[2]);
-            lines[14] = Convert.ToString(world.wolves.pos.row) + " " + Convert.ToString(world.wolves.pos.col);
-            lines[15] = Convert.ToString(world.wolves.health);
-            lines[16] = Convert.ToString(world.wolves.maxHealth);
-            lines[17] = Convert.ToString(world.wolves.attack[0]) + " " + Convert.ToString(world.wolves.attack[1]) + " " + Convert.ToString(world.wolves.attack[2]);
-            for (int i=0;i<world.villagePositions.Count()-1;i++)
-            {
-                lines[18] += Convert.ToString(world.villagePositions[i].row) + " " + Convert.ToString(world.villagePositions[i].col) + ",";
-            }
-            lines[18] += Convert.ToString(world.villagePositions[world.villagePositions.Count() - 1].row) + " " + Convert.ToString(world.villagePositions[world.villagePositions.Count() - 1].col);
-            for (int i = 0; i < world.destroyedVillages.Count() - 1; i++)
-            {
-                lines[19] += Convert.ToString(world.destroyedVillages[i].row) + " " + Convert.ToString(world.destroyedVillages[i].col) + ",";
-            }
-            lines[19] += Convert.ToString(world.destroyedVillages[world.destroyedVillages.Count() - 1].row) + " " + Convert.ToString(world.destroyedVillages[world.destroyedVillages.Count() - 1].col);
-            for (int i = 0; i < world.shrines.Count() - 1; i++)
-            {
-                lines[20] += Convert.ToString(world.shrines[i].pos.row) + " " + Convert.ToString(world.shrines[i].pos.col) + ",";
-            }
-            lines[20] += Convert.ToString(world.shrines[world.shrines.Count() - 1].pos.row) + " " + Convert.ToString(world.shrines[world.shrines.Count() - 1].pos.col);
-            for (int i = 0; i < world.shrines.Count() - 1; i++)
-            {
-                lines[21] += Convert.ToString(world.shrines[i].solved);
-                lines[21] += " ";
-            }
-            lines[21] += Convert.ToString(world.shrines[world.shrines.Count() - 1].solved);
-
-
-            // Delete any existing files
-            if (File.Exists("saves/"+filename))
-            {
-                File.Delete("saves/"+filename);
-            }
-            // Write to the file
-            using (StreamWriter sw = new StreamWriter("saves/" + filename, true))
-            {
-                foreach (var str in lines)
-                {
-                    sw.WriteLine(str);
-                }
-            }
-
-
-        }
-        public static void Load(string filename)
-        {
-            /* This function is very important. It is used by the user at the start of the program to start the game.
-             * It opens a load file and assigns the values saved in the file to the world gamestate.
-             */
-
-            // Read in the game state from the file
-            string gameState = File.ReadAllText("saves/" + filename, Encoding.UTF8); // Read in all contents from file
-            // Since in windows a newline is represented by \r\n, Regex is used to replace the \r characters (because Regex is cool).
-            // Actually, it is because '.Split' only works with chars, so it cannot split at an occurence of "/r/n"... since that is a string...
-
-            gameState = Regex.Replace(gameState, @"\r", "");
-            world.rows = Convert.ToInt32(gameState.Split('\n')[0].Split(' ')[0]); // Find row value
-            world.cols = Convert.ToInt32(gameState.Split('\n')[0].Split(' ')[1]); // Find column value
-            world.turnNum = Convert.ToInt32(gameState.Split('\n')[0].Split(' ')[2]); // Find turn number
-            world.numVillages = Convert.ToInt32(gameState.Split('\n')[0].Split(' ')[3]);
-            world.numShrines = Convert.ToInt32(gameState.Split('\n')[0].Split(' ')[2]);
-
-            world.hawkPosition.row = Convert.ToInt32(gameState.Split('\n')[1].Split(' ')[0]);
-            world.hawkPosition.col = Convert.ToInt32(gameState.Split('\n')[1].Split(' ')[1]);
-
-            world.maejaPosition.row = Convert.ToInt32(gameState.Split('\n')[2].Split(' ')[0]);
-            world.maejaPosition.col = Convert.ToInt32(gameState.Split('\n')[2].Split(' ')[1]);
-
-            world.questPosition.row = Convert.ToInt32(gameState.Split('\n')[3].Split(' ')[0]);
-            world.questPosition.col = Convert.ToInt32(gameState.Split('\n')[3].Split(' ')[1]);
-
-
-            world.aurora.pos.row = Convert.ToInt32(gameState.Split('\n')[4].Split(' ')[0]); // Find aurora's row position
-            world.aurora.pos.col = Convert.ToInt32(gameState.Split('\n')[4].Split(' ')[1]); // Find aurora's col position
-            world.aurora.health = Convert.ToInt32(gameState.Split('\n')[5]); // Find aurora's health
-            world.aurora.maxHealth = Convert.ToInt32(gameState.Split('\n')[6]); // Find aurora's maximum health
-            world.aurora.attack = Array.ConvertAll(gameState.Split('\n')[7].Split(' '), s => int.Parse(s)); // Find aurora's attack stats
-            world.spells = Array.ConvertAll(gameState.Split('\n')[8].Split(' '), s => int.Parse(s)); // Find aurora's collected spells
-            world.gold = Convert.ToInt32(gameState.Split('\n')[9]); // Find aurora's gold
-            world.trollKing.pos.row = Convert.ToInt32(gameState.Split('\n')[10].Split(' ')[0]);
-            world.trollKing.pos.col = Convert.ToInt32(gameState.Split('\n')[10].Split(' ')[1]);
-            world.trollKing.health = Convert.ToInt32(gameState.Split('\n')[11]);
-            world.trollKing.maxHealth = Convert.ToInt32(gameState.Split('\n')[12]);
-            world.trollKing.attack = Array.ConvertAll(gameState.Split('\n')[13].Split(' '), s => int.Parse(s));
-            world.wolves.pos.row = Convert.ToInt32(gameState.Split('\n')[14].Split(' ')[0]);
-            world.wolves.pos.col = Convert.ToInt32(gameState.Split('\n')[14].Split(' ')[1]);
-            world.wolves.health = Convert.ToInt32(gameState.Split('\n')[15]);
-            world.wolves.maxHealth = Convert.ToInt32(gameState.Split('\n')[16]);
-            world.wolves.attack = Array.ConvertAll(gameState.Split('\n')[17].Split(' '), s => int.Parse(s));
-            // Get village positions
-            string[] tempArray = Array.ConvertAll(gameState.Split('\n')[18].Split(','), s => s);
-            world.villagePositions = new Position[tempArray.Length]; // Initialise world.villagePositions
-            for (int i = 0; i < tempArray.Length; i++)
-            {
-                if (tempArray[i] != "") // Doesn't actually need this line (but just a precaution since another block needed it).
-                {
-                    world.villagePositions[i].row = Convert.ToInt32(tempArray[i].Split(' ')[0]);
-                    world.villagePositions[i].col = Convert.ToInt32(tempArray[i].Split(' ')[1]);
-                }
-            }
-            // Get destroyed village positions
-            tempArray = Array.ConvertAll(gameState.Split('\n')[19].Split(','), s => s);
-
-            world.destroyedVillages = new List<Position>(); // Initialise world.destroyedVillages
-            Position tempPos = new Position();
-            for (int i = 0; i < tempArray.Length; i++)
-            {
-                 // This block of code was the one which needed the line below (mentioned near here),
-                 // since sometimes the input will be empty when no villages have been destroyed.
-                if (tempArray[i] != "") // Splitting empty string results in "" (so it must be skipped).
-
-                {
-                    tempPos.row = Convert.ToInt32(tempArray[i].Split(' ')[0]);
-                    tempPos.col = Convert.ToInt32(tempArray[i].Split(' ')[1]);
-                    world.destroyedVillages.Add(tempPos);
-                }
-            }
-            // Generate the first target for the Troll King
-            world.targetVillagePosition = world.villagePositions[random.Next() % world.villagePositions.Length];
-
-            // Get shrine positions
-            tempArray = Array.ConvertAll(gameState.Split('\n')[20].Split(','), s => s);
-            world.shrines = new Shrine[tempArray.Length]; // Initialise world.shrines
-            for (int i = 0; i < tempArray.Length; i++)
-            {
-                if (tempArray[i] != "") // Same idea... doesn't actually need it, but just a precaution.
-                {
-                    world.shrines[i].pos.row = Convert.ToInt32(tempArray[i].Split(' ')[0]);
-                    world.shrines[i].pos.col = Convert.ToInt32(tempArray[i].Split(' ')[1]);
-                }
-            }
-            // Get whether the shrines are solved
-            tempArray = Array.ConvertAll(gameState.Split('\n')[21].Split(' '), s => s);
-            for (int i = 0; i < tempArray.Length; i++)
-            {
-                if (tempArray[i] != "") 
-                {
-                    world.shrines[i].solved = Convert.ToInt32(tempArray[i]);
-                }
-            }
-
-
-
-            ICON_WIDTH = (int)Math.Floor(MAP_WIDTH / Convert.ToDouble(world.cols));
-            ICON_HEIGHT = (int)Math.Floor(MAP_HEIGHT / Convert.ToDouble(world.rows));
-            ICON_WIDTH = Math.Min(ICON_HEIGHT, ICON_WIDTH);
-            ICON_HEIGHT = Math.Min(ICON_HEIGHT, ICON_WIDTH);
-            MAP_HEIGHT = ICON_HEIGHT * world.rows;
-            MAP_WIDTH = ICON_WIDTH * world.cols;
-        }
-        // USER MOVEMENT //
-        static void MoveAurora()
+        // MOVEMENT //
+        public static void MoveAurora()
         {
             /* This function does everything necessary to collect the information and move Aurora
              * to a valid position.
@@ -597,7 +254,7 @@ namespace Trurene_RPG
             }
 
         }
-        static List<Position> CalcValidMoves(Position pos)
+        public static List<Position> CalcValidMoves(Position pos)
         {
             /* This function generates a list of valid moves which any entity at a given position can move to.
              * It is essentially the squares above, below and to the left and right.
@@ -634,8 +291,104 @@ namespace Trurene_RPG
 
             return validMoves;
         }
+        public static void UpdateWorld()
+        {
+            /* This function updates the world without moving Aurora. This includes destroying any villages and moving
+             * each of the NPCs which can move.
+             */
+            // Destroy Villages
+            if (DistanceBetween(world.trollKing.pos, world.targetVillagePosition) == 0)
+            {
+                world.destroyedVillages.Add(world.trollKing.pos);
+                world.targetVillagePosition = world.villagePositions.Except(world.destroyedVillages).ToList()[random.Next(world.villagePositions.Length - world.destroyedVillages.Count() - 1)];
+            }
+            // Move Hawk if he is on a destroyed village
+            if (world.destroyedVillages.Contains(world.hawkPosition))
+            {
+                world.hawkPosition = world.villagePositions.Except(world.destroyedVillages).ToList()[random.Next(world.villagePositions.Length)];
+            }
+            // Move NPCs
+            if (world.turnNum % 2 == 0)
+            {
+                MoveTrollKing();
+            }
+            if (world.turnNum % 3 == 0)
+            {
+                MoveWolves();
+            }
+        }
+        public static void MoveTrollKing()
+        {
+            /* This function moves the Troll King one step closer to the target village.
+             * However, if Aurora is with his detection proximity, he will instead move away from her.
+             */
+            List<Position> possibleMoves;
+            if (DistanceBetween(world.trollKing.pos, world.aurora.pos) <= TrollKingInfo.PROXIMITY)
+            {
+                possibleMoves = CalcValidMoves(world.trollKing.pos).Except(MoveCloserTo(world.trollKing.pos, world.aurora.pos)).ToList();
+
+            }
+            else
+            {
+                possibleMoves = MoveCloserTo(world.trollKing.pos, world.targetVillagePosition);
+
+            }
+            if (possibleMoves.Count() == 0) // sometimes the Troll King can be pinned in a corner, where he has nowhere to go
+            {
+                possibleMoves = MoveCloserTo(world.trollKing.pos, world.targetVillagePosition);
+            }
+            world.trollKing.pos = possibleMoves[random.Next(possibleMoves.Count)];
+        }
+        public static void MoveWolves()
+        {
+            /* This moves the wolves one step closer to Aurora's position.
+             */
+            List<Position> possibleMoves = MoveCloserTo(world.wolves.pos, world.aurora.pos);
+            try
+            {
+                world.wolves.pos = possibleMoves[random.Next(possibleMoves.Count)];
+            }
+            catch
+            {
+                // Do nothing because Aurora must have retreated as they are currently on the same square.
+            }
+        }
+        public static List<Position> MoveCloserTo(Position current, Position target)
+        {
+            /* This function generates a list of possible moves to move the current position
+             * closer to the target position.
+             */
+            List<Position> possibleFinalPos = new List<Position>();
+            Position finalPos = new Position();
+            if (current.row < target.row)
+            {
+                finalPos.row = current.row + 1;
+                finalPos.col = current.col;
+                possibleFinalPos.Add(finalPos);
+            }
+            else if (current.row > target.row)
+            {
+                finalPos.row = current.row - 1;
+                finalPos.col = current.col;
+                possibleFinalPos.Add(finalPos);
+            }
+            if (current.col < target.col)
+            {
+                finalPos.row = current.row;
+                finalPos.col = current.col + 1;
+                possibleFinalPos.Add(finalPos);
+            }
+            else if (current.col > target.col)
+            {
+                finalPos.row = current.row;
+                finalPos.col = current.col - 1;
+                possibleFinalPos.Add(finalPos);
+            }
+            return possibleFinalPos;
+        }
+
         // USER INTERACTION //
-        static void CalcTurnEvents()
+        public static void CalcTurnEvents()
         {
             /* This function is one of the most complicated functions.
              * It determines all of the interactions and calls them between the player
@@ -949,7 +702,7 @@ namespace Trurene_RPG
             }
             return fighting;
         }
-        static void DoMaeja()
+        public static void DoMaeja()
         {
             /* This function does all of the events relating the user to talking with Maeja.
              * If the user it is currently learning any spells it teaches them to Aurora.
@@ -987,7 +740,7 @@ namespace Trurene_RPG
                 world.wolves = CreatureToCharacter(wolves, world.wolves); // Update wolves
             }
         }
-        static void DoShrine()
+        public static void DoShrine()
         {
             /* This functions does all of the dialogye and generates the spell that the user, Aurora learns.
              * It also does the puzzle for the user to do when doing the shrine.
@@ -1011,18 +764,17 @@ namespace Trurene_RPG
             }
             if (shrine.solved == 0 && !learning)
             {
-                CustomMessageBox.ShowText("You see a shrine and enter it.", "SHRINE", NORMAL_BACK, NORMAL_FORE);
+                AddNotification("You enter a shrine!\n", new DependencyProperty[] { TextElement.ForegroundProperty }, new object[] { Brushes.Black });
                 int num1 = random.Next(100);
                 int num2 = random.Next(100);
-                CustomMessageBox.ShowText("The instructions on the stone say press the button and enter the answer before the time runs out.", "SHRINE", NORMAL_BACK, NORMAL_FORE);
-                CustomMessageBox.ShowText("Press OK when you are ready. You must enter within 5 seconds otherwise it will fail.", "SHRINE", NORMAL_BACK, NORMAL_FORE);
+                CustomMessageBox.ShowText("Press OK when you are ready. You must enter within 5 seconds to open the secret door!", "SHRINE", NORMAL_BACK, NORMAL_FORE);
                 DateTime time1 = DateTime.Now;
                 string answer = CustomMessageBox.ShowTextEntry("What is " + Convert.ToString(num1) + " + " + Convert.ToString(num2),"SHRINE");
                 DateTime time2 = DateTime.Now;
                 double diffInSeconds = (time1 - time2).TotalSeconds;
                 if (diffInSeconds<=5 && Convert.ToInt32(answer) == num1+num2) 
                 {
-                    CustomMessageBox.ShowText("The stone shuts and a secret doorway opens. You enter and see an artefact.", "SHRINE", SUCCESS_BACK, SUCCESS_FORE);
+                    AddNotification("The door closes behind you and a secret doorway opens. An artefact is glowing in the darkness!\n", new DependencyProperty[] { TextElement.ForegroundProperty }, new object[] { Brushes.Green });
                     if (world.spells[0] == 2 && world.spells[1] == 2 && world.spells[2] == 2) // Check if it is time to learn Omniscience
                     {
                         index = 3;
@@ -1034,7 +786,7 @@ namespace Trurene_RPG
                             index = random.Next(3);
                         } while (world.spells[index] == 2);
                     }
-                    CustomMessageBox.ShowText("You pick it up and see that it is the " + artefacts[index], "SHRINE", GOLD_BACK, GOLD_FORE);
+                    AddNotification("You pick it up and see that it is the " + artefacts[index] + "\n", new DependencyProperty[] { TextElement.ForegroundProperty }, new object[] { Brushes.Gold });
                     world.spells[index] = 1;
                     // Find the shrine and set it to solved.
                     for (int i = 0;i<4;i++)
@@ -1050,20 +802,20 @@ namespace Trurene_RPG
                 }
                 else
                 {
-                    CustomMessageBox.ShowText("The question vanishes and... nothing happens.", "SHRINE", WARNING_BACK, WARNING_FORE);
+                    AddNotification("The question vanishes and... nothing happens\n", new DependencyProperty[] { TextElement.ForegroundProperty }, new object[] { Brushes.Red });
                 }
             }
             else if (learning)
             {
-                CustomMessageBox.ShowText("You cannot get another artefact. You haven't learnt how to use the first one yet. Go to Maeja to learn about it!", "SHRINE ERROR", WARNING_BACK, WARNING_FORE);
+                AddNotification("You cannot get another artefact. You must go to Maeja to learn how to use the artefact you currently have!\n", new DependencyProperty[] { TextElement.ForegroundProperty }, new object[] { Brushes.Red });
 
             }
             else
             {
-                CustomMessageBox.ShowText("You have already solved this shrine!", "SHRINE ERROR", WARNING_BACK, WARNING_FORE);
+                AddNotification("You have already solved this shrine!\n", new DependencyProperty[] { TextElement.ForegroundProperty }, new object[] { Brushes.Red });
             }
         }
-        static void DoVillage() 
+        public static void DoVillage() 
         {
             /* This function chooses two people for the user to speak to. It runs the interactions for each one if
              * the user decides to talk to them. It also talks the user with Hawk if he is there.
@@ -1072,8 +824,8 @@ namespace Trurene_RPG
             if (DistanceBetween(world.hawkPosition, world.aurora.pos) == 0)
             {
                 string message = "Hey Aurora! I draw where I think that the Troll King is on your map! ";
-                message += "I also draw where the wolves are, I heard that they are hunting you. You should be careful.";
-                CustomMessageBox.ShowText(message, "HAWK", SUCCESS_BACK, SUCCESS_FORE);
+                message += "I also draw where the wolves are, I heard that they are hunting you. You should be careful.\n";
+                AddNotification(message, new DependencyProperty[] { TextElement.ForegroundProperty }, new object[] { Brushes.Green });
                 hawkOmniscience = true;
             }
             // Generate two random people from Quester, Hunter and Merchant.
@@ -1098,14 +850,16 @@ namespace Trurene_RPG
                     else
                     {
                         DoHunter();
+                        AddNotification("You walk back to the village and tell the Hunter how you killed the beast.\n", new DependencyProperty[] { TextElement.ForegroundProperty }, new object[] { Brushes.Black });
                     }
                 }
-                CustomMessageBox.ShowText("You walk away from the " + person + " and keep looking around.", "VILLAGE", NORMAL_BACK, NORMAL_FORE);
+                AddNotification("You walk away from the " + person + " and keep looking around.\n", new DependencyProperty[] { TextElement.ForegroundProperty }, new object[] { Brushes.Black });
+               
             }
-            CustomMessageBox.ShowText("You don't see anybody else.", "VILLAGE", NORMAL_BACK, NORMAL_FORE);
+            AddNotification("You don't see anybody else.\n", new DependencyProperty[] { TextElement.ForegroundProperty }, new object[] { Brushes.Black });
 
         }
-        static void DoHunter()
+        public static void DoHunter()
         {
             /* This function runs the interaction which Aurora has with a Hunter, including fighting Aurora
              * against a large creature.
@@ -1113,7 +867,6 @@ namespace Trurene_RPG
             bool entry = CustomMessageBox.ShowConfirmation("Are you sure you want me to find you some nice loot ('YES/'NO')", "HUNTER");
             if (entry)
             {
-                CustomMessageBox.ShowText("The loot is just around the corner.", "HUNTER", NORMAL_BACK, NORMAL_FORE);
                 CustomMessageBox.ShowText("I hope you find some good loot... and survive.", "HUNTER", NORMAL_BACK, NORMAL_FORE);
                 // Create the large creature
                 enemy.maxHealth = random.Next(LargeCreatureInfo.MIN_HEALTH, LargeCreatureInfo.MAX_HEALTH);
@@ -1125,14 +878,15 @@ namespace Trurene_RPG
                 enemy.reward = (int)Math.Floor(LargeCreatureInfo.REWARD_MUTLIPLIER * enemy.maxHealth);
                 // Fight the large creature
                 fighting = true;
-                CustomMessageBox.ShowText("You have encountered a LARGE CREATURE!!! Get ready to fight!", "FIGHTING", WARNING_BACK, WARNING_FORE);
+                AddNotification("You have encountered a LARGE CREATURE!!!\n", new DependencyProperty[] { TextElement.ForegroundProperty }, new object[] { Brushes.Red });
+                
             }
             else
             {
                 CustomMessageBox.ShowText("I wouldn't go out there either.", "HUNTER", NORMAL_BACK, NORMAL_FORE);
             }
         }
-        static void DoMerchant() 
+        public static void DoMerchant() 
         {
             /* This function runs the interaction which Aurora has with any Merchants.
              * This NPC is actually the most complicated who is able to have an attitude towards
@@ -1232,7 +986,7 @@ namespace Trurene_RPG
                 
             } while (true);
         }
-        static void DoQuester()
+        public static void DoQuester()
         {
             /* This function runs the interaction that Aurora has with a Quester. This includes choosing a location and
              * changing the value of the world variable to include this location.
@@ -1257,7 +1011,7 @@ namespace Trurene_RPG
                 }
             }
         }
-        static void DoMessages() 
+        public static void DoMessages() 
         {
             /* This function runs the messages which the user will receive at the start of each turn.
              * This includes the location of the Troll King relative to Aurora and any proximity alerts to the wolves.
@@ -1293,132 +1047,8 @@ namespace Trurene_RPG
             }
 
         }
-        // GAME WORLD AND NPC MOVEMENT //
-        static void UpdateWorld()
-        {
-            /* This function updates the world without moving Aurora. This includes destroying any villages and moving
-             * each of the NPCs which can move.
-             */
-            // Destroy Villages
-            if (DistanceBetween(world.trollKing.pos, world.targetVillagePosition) == 0)
-            {
-                world.destroyedVillages.Add(world.trollKing.pos);
-                world.targetVillagePosition = world.villagePositions.Except(world.destroyedVillages).ToList()[random.Next(world.villagePositions.Length-world.destroyedVillages.Count()-1)];
-            }
-            // Move Hawk if he is on a destroyed village
-            if (world.destroyedVillages.Contains(world.hawkPosition))
-            {
-                world.hawkPosition = world.villagePositions.Except(world.destroyedVillages).ToList()[random.Next(world.villagePositions.Length)];
-            }
-            // Move NPCs
-            if (world.turnNum % 2 == 0)
-            {
-                MoveTrollKing();
-            }
-            if (world.turnNum % 3 == 0)
-            {
-                MoveWolves();
-            }
-        }
-        static void MoveTrollKing()
-        {
-            /* This function moves the Troll King one step closer to the target village.
-             * However, if Aurora is with his detection proximity, he will instead move away from her.
-             */
-            List<Position> possibleMoves;
-            if (DistanceBetween(world.trollKing.pos, world.aurora.pos) <= TrollKingInfo.PROXIMITY)
-            {
-                possibleMoves = CalcValidMoves(world.trollKing.pos).Except(MoveCloserTo(world.trollKing.pos, world.aurora.pos)).ToList();
-                
-            }
-            else
-            {
-                possibleMoves = MoveCloserTo(world.trollKing.pos, world.targetVillagePosition);
-                
-            }
-            if (possibleMoves.Count() == 0) // sometimes the Troll King can be pinned in a corner, where he has nowhere to go
-            {
-                possibleMoves = MoveCloserTo(world.trollKing.pos, world.targetVillagePosition);
-            }
-            world.trollKing.pos = possibleMoves[random.Next(possibleMoves.Count)];
-        }
-        static void MoveWolves()
-        {
-            /* This moves the wolves one step closer to Aurora's position.
-             */
-            List<Position> possibleMoves = MoveCloserTo(world.wolves.pos, world.aurora.pos);
-            try
-            {
-                world.wolves.pos = possibleMoves[random.Next(possibleMoves.Count)];
-            }
-            catch
-            {
-                // Do nothing because Aurora must have retreated as they are currently on the same square.
-            }
-        }
-        static List<Position> MoveCloserTo(Position current, Position target)
-        {
-            /* This function generates a list of possible moves to move the current position
-             * closer to the target position.
-             */
-            List<Position> possibleFinalPos = new List<Position>();
-            Position finalPos = new Position();
-            if (current.row < target.row)
-            {
-                finalPos.row = current.row + 1;
-                finalPos.col = current.col;
-                possibleFinalPos.Add(finalPos);
-            }
-            else if (current.row > target.row)
-            {
-                finalPos.row = current.row - 1;
-                finalPos.col = current.col;
-                possibleFinalPos.Add(finalPos);
-            }
-            if (current.col < target.col)
-            {
-                finalPos.row = current.row;
-                finalPos.col = current.col + 1;
-                possibleFinalPos.Add(finalPos);
-            }
-            else if (current.col > target.col) {
-                finalPos.row = current.row;
-                finalPos.col = current.col - 1;
-                possibleFinalPos.Add(finalPos);
-            }
-            return possibleFinalPos;
-        }
-        static void DoCommand(string command)
-        {
-            /* This function runs any commands which the user enters. These can be entered at multiple times during the game.
-             */
-            switch (command) {
-                
-                case "/quit":
-                    NormalUI.Shutdown();
-                    break;
-                case "/hawk":
-                    string hawkPos = Convert.ToString(world.hawkPosition.row) + " ";
-                    hawkPos += Convert.ToString(world.hawkPosition.col);
-                    CustomMessageBox.ShowText(hawkPos, "HAWK'S POSITION", SUCCESS_BACK, SUCCESS_FORE);
-                    break;
-                case "/maeja":
-                    string maejaPos = Convert.ToString(world.maejaPosition.row) + " ";
-                    maejaPos += Convert.ToString(world.maejaPosition.col);
-                    CustomMessageBox.ShowText(maejaPos, "MAEJA'S POSITION", SUCCESS_BACK, SUCCESS_FORE);
-                    break;
-                case "/save":
-                    string saveFile = CustomMessageBox.ShowTextEntry("Filename", "SAVE");
-                    break;
-                case "/load":
-                    string loadFile = CustomMessageBox.ShowTextEntry("Filename", "LOAD");
-                    break;
-                default:
-                    CustomMessageBox.ShowText("Invalid command!", "COMMAND ERROR", WARNING_BACK, WARNING_FORE);
-                    break;
-            }
 
-        }
+        // GAME WORLD //
         public static void GenerateRandomWorld(int size)
         {
             /* This function creates a random world.
@@ -1535,6 +1165,116 @@ namespace Trurene_RPG
 
 
         }
+        public static void UpdateMapIcons()
+        {
+            EMPTY_ICON = Image.FromFile("data/resource packs/" + RESOURCE_PACK + "/empty-icon.png");
+            AURORA_ICON = Image.FromFile("data/resource packs/" + RESOURCE_PACK + "/aurora-icon.png");
+            TROLL_KING_ICON = Image.FromFile("data/resource packs/" + RESOURCE_PACK + "/troll-king-icon.png");
+            WOLVES_ICON = Image.FromFile("data/resource packs/" + RESOURCE_PACK + "/wolves-icon.png");
+            INTACT_VILLAGE_ICON = Image.FromFile("data/resource packs/" + RESOURCE_PACK + "/intact-village-icon.png");
+            DESTROYED_VILLAGE_ICON = Image.FromFile("data/resource packs/" + RESOURCE_PACK + "/destroyed-village-icon.png");
+            UNSOLVED_SHRINE_ICON = Image.FromFile("data/resource packs/" + RESOURCE_PACK + "/unsolved-shrine-icon.png");
+            SOLVED_SHRINE_ICON = Image.FromFile("data/resource packs/" + RESOURCE_PACK + "/solved-shrine-icon.png");
+            MAEJA_ICON = Image.FromFile("data/resource packs/" + RESOURCE_PACK + "/maeja-icon.png");
+            HAWK_ICON = Image.FromFile("data/resource packs/" + RESOURCE_PACK + "/hawk-icon.png");
+            QUEST_ICON = Image.FromFile("data/resource packs/" + RESOURCE_PACK + "/quest-icon.png");
+        }
+        public static ImageSource CalculateMap()
+        {
+            /* This function is responsible for creating the map. The map is actually one large
+                * picture, but this function gets each individual smaller image (icon) and essentially
+                * "squashes" the images together to make the larger map. This function is used every
+                * single turn to update what the map looks like.
+                */
+
+            List<List<Image>> map = new List<List<Image>>(world.rows);
+
+            // Create the empty world
+            for (int r = 0; r < world.rows; r++)
+            {
+                map.Add(new List<Image>(world.cols));  // Add images to list
+                for (int c = 0; c < world.cols; c++)
+                {
+                    map[r].Add(EMPTY_ICON); // Add images to list
+                }
+
+            }
+
+            try
+            {
+                // Add icons to the map
+                foreach (Position pos in world.villagePositions) // Add the intact villages
+                {
+                    map[pos.row][pos.col] = INTACT_VILLAGE_ICON;
+                }
+                foreach (Position pos in world.destroyedVillages) // Add the destroyed villages 
+                {
+                    if (pos.row != -1 && pos.col != -1) // Makes everything way easier by making a -1 -1 default first destroyed village (if nothing else is destroyed).
+                    {
+                        map[pos.row][pos.col] = DESTROYED_VILLAGE_ICON;
+                    }
+                }
+                foreach (Shrine shrine in world.shrines)
+                {
+                    if (shrine.solved == 0)
+                    {
+                        map[shrine.pos.row][shrine.pos.col] = UNSOLVED_SHRINE_ICON;
+                    }
+                    else
+                    {
+                        map[shrine.pos.row][shrine.pos.col] = SOLVED_SHRINE_ICON;
+                    }
+                }
+                map[world.aurora.pos.row][world.aurora.pos.col] = AURORA_ICON; // Add Aurora's icon
+                map[world.maejaPosition.row][world.maejaPosition.col] = MAEJA_ICON; // Add Maeja's icon
+                map[world.hawkPosition.row][world.hawkPosition.col] = HAWK_ICON; // Add Hawk's icon
+
+
+                if (world.spells[OMNISCIENCE_INDEX] == SPELL_LEARNT || hawkOmniscience) // Add Wolves and Troll King icons if Omniscience has been learnt or Hawk told her where they are
+                {
+                    map[world.wolves.pos.row][world.wolves.pos.col] = WOLVES_ICON;
+                    map[world.trollKing.pos.row][world.trollKing.pos.col] = TROLL_KING_ICON;
+
+
+                }
+                if (world.questPosition.row != -1 && world.questPosition.col != -1) // If there is a quest add its icon
+                {
+                    map[world.questPosition.row][world.questPosition.col] = QUEST_ICON;
+                }
+            }
+            catch { }
+
+
+
+            // your code
+            ImageSource source;
+            using (Bitmap bitmapMap = new Bitmap(world.rows * ICON_WIDTH, world.cols * ICON_HEIGHT)) // this is to prevent a memory leak
+            {
+                Graphics g = Graphics.FromImage(bitmapMap);
+                // Add images to the bitmap
+                for (int r = 0; r < world.rows; r++)
+                {
+                    for (int c = 0; c < world.cols; c++)
+                    {
+                        g.DrawImage(map[r][c], (c) * ICON_WIDTH, (r) * ICON_HEIGHT, ICON_WIDTH, ICON_HEIGHT);
+                    }
+                }
+                IntPtr hBitmap = bitmapMap.GetHbitmap();
+
+                try
+                {
+                    source = System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(hBitmap, IntPtr.Zero, Int32Rect.Empty, System.Windows.Media.Imaging.BitmapSizeOptions.FromEmptyOptions());
+                }
+                finally
+                {
+                    DeleteObject(hBitmap);
+                }
+            }
+            // Return the new ImageSource.
+            return source;
+
+        }
+
         // MISC IMPORTANT //
         public static Creature CharacterToCreature(Character character)
         {
@@ -1602,10 +1342,6 @@ namespace Trurene_RPG
                     }
                     stats[1] = (int)Math.Floor(gold * MaceInfo.POWER_MULTIPLIER);
                     stats[2] = (int)Math.Floor(MaceInfo.TIME_QUOTIENT / Convert.ToDouble(gold));
-                    if (stats[2] == 0) // Cause your not allowed to have this (too OP)
-                    {
-                        stats[2] = 1;
-                    }
                     break;
                 case "SWORD":
                     stats[0] = (int)Math.Floor(gold * SwordInfo.ACCURACY_MULTIPLIER);
@@ -1615,10 +1351,7 @@ namespace Trurene_RPG
                     }
                     stats[1] = (int)Math.Floor(gold * SwordInfo.POWER_MULTIPLIER);
                     stats[2] = (int)Math.Floor(SwordInfo.TIME_QUOTIENT / Convert.ToDouble(gold));
-                    if (stats[2] == 0) // Cause your not allowed to have this (too OP)
-                    {
-                        stats[2] = 1;
-                    }
+
                     break;
                 case "DAGGER":
                     stats[0] = (int)Math.Floor(gold * DaggerInfo.ACCURACY_MULTIPLIER);
@@ -1628,14 +1361,262 @@ namespace Trurene_RPG
                     }
                     stats[1] = (int)Math.Floor(gold * DaggerInfo.POWER_MULTIPLIER);
                     stats[2] = (int)Math.Floor(DaggerInfo.TIME_QUOTIENT / Convert.ToDouble(gold));
-                    if (stats[2] == 0) // Cause your not allowed to have this (too OP)
-                    {
-                        stats[2] = 1;
-                    }
+
                     break;
                 
             }
+            // Do some balancing of the stats (so the weapon isn't ridiculously overpowered or underpowered)
+            if (stats[2] == 0) // Cause you're not allowed to have this (too OP)
+            {
+                stats[2] = 1;
+            }
+            if (stats[0] < 30)
+            {
+                stats[0] = 30;
+            }
+            if (stats[1] < 5)
+            {
+                stats[1] = 5;
+            }
+            if (stats[2] > 6)
+            {
+                stats[2] = 6;
+            }
             return stats;
+        }
+        public static void Save(string filename)
+        {
+            /* This function writes all of the important values to a save file so that the user 
+             * can load it later to play the game. It is given a value for a filename.
+             */
+
+
+
+            // Create a string array 
+            string[] lines = new string[22];
+            lines[0] = Convert.ToString(world.rows) + " " + Convert.ToString(world.cols) + " " + Convert.ToString(world.turnNum) + " " + Convert.ToString(world.numVillages) + " " + Convert.ToString(world.numShrines);
+            lines[1] = Convert.ToString(world.hawkPosition.row) + " " + Convert.ToString(world.hawkPosition.col);
+            lines[2] = Convert.ToString(world.maejaPosition.row) + " " + Convert.ToString(world.maejaPosition.col);
+            lines[3] = Convert.ToString(world.questPosition.row) + " " + Convert.ToString(world.questPosition.col);
+            lines[4] = Convert.ToString(world.aurora.pos.row) + " " + Convert.ToString(world.aurora.pos.col);
+            lines[5] = Convert.ToString(world.aurora.health);
+            lines[6] = Convert.ToString(world.aurora.maxHealth);
+            lines[7] = Convert.ToString(world.aurora.attack[0]) + " " + Convert.ToString(world.aurora.attack[1]) + " " + Convert.ToString(world.aurora.attack[2]);
+            lines[8] = Convert.ToString(world.spells[0]) + " " + Convert.ToString(world.spells[1]) + " " + Convert.ToString(world.spells[2]) + " " + Convert.ToString(world.spells[3]);
+            lines[9] = Convert.ToString(world.gold);
+            lines[10] = Convert.ToString(world.trollKing.pos.row) + " " + Convert.ToString(world.trollKing.pos.col);
+            lines[11] = Convert.ToString(world.trollKing.health);
+            lines[12] = Convert.ToString(world.trollKing.maxHealth);
+            lines[13] = Convert.ToString(world.trollKing.attack[0]) + " " + Convert.ToString(world.trollKing.attack[1]) + " " + Convert.ToString(world.trollKing.attack[2]);
+            lines[14] = Convert.ToString(world.wolves.pos.row) + " " + Convert.ToString(world.wolves.pos.col);
+            lines[15] = Convert.ToString(world.wolves.health);
+            lines[16] = Convert.ToString(world.wolves.maxHealth);
+            lines[17] = Convert.ToString(world.wolves.attack[0]) + " " + Convert.ToString(world.wolves.attack[1]) + " " + Convert.ToString(world.wolves.attack[2]);
+            for (int i = 0; i < world.villagePositions.Count() - 1; i++)
+            {
+                lines[18] += Convert.ToString(world.villagePositions[i].row) + " " + Convert.ToString(world.villagePositions[i].col) + ",";
+            }
+            lines[18] += Convert.ToString(world.villagePositions[world.villagePositions.Count() - 1].row) + " " + Convert.ToString(world.villagePositions[world.villagePositions.Count() - 1].col);
+            for (int i = 0; i < world.destroyedVillages.Count() - 1; i++)
+            {
+                lines[19] += Convert.ToString(world.destroyedVillages[i].row) + " " + Convert.ToString(world.destroyedVillages[i].col) + ",";
+            }
+            lines[19] += Convert.ToString(world.destroyedVillages[world.destroyedVillages.Count() - 1].row) + " " + Convert.ToString(world.destroyedVillages[world.destroyedVillages.Count() - 1].col);
+            for (int i = 0; i < world.shrines.Count() - 1; i++)
+            {
+                lines[20] += Convert.ToString(world.shrines[i].pos.row) + " " + Convert.ToString(world.shrines[i].pos.col) + ",";
+            }
+            lines[20] += Convert.ToString(world.shrines[world.shrines.Count() - 1].pos.row) + " " + Convert.ToString(world.shrines[world.shrines.Count() - 1].pos.col);
+            for (int i = 0; i < world.shrines.Count() - 1; i++)
+            {
+                lines[21] += Convert.ToString(world.shrines[i].solved);
+                lines[21] += " ";
+            }
+            lines[21] += Convert.ToString(world.shrines[world.shrines.Count() - 1].solved);
+
+
+            // Delete any existing files
+            if (File.Exists("saves/" + filename))
+            {
+                File.Delete("saves/" + filename);
+            }
+            // Write to the file
+            using (StreamWriter sw = new StreamWriter("saves/" + filename, true))
+            {
+                foreach (var str in lines)
+                {
+                    sw.WriteLine(str);
+                }
+            }
+
+
+        }
+        public static void Load(string filename)
+        {
+            /* This function is very important. It is used by the user at the start of the program to start the game.
+             * It opens a load file and assigns the values saved in the file to the world gamestate.
+             */
+
+            // Read in the game state from the file
+            string gameState = File.ReadAllText("saves/" + filename, Encoding.UTF8); // Read in all contents from file
+            // Since in windows a newline is represented by \r\n, Regex is used to replace the \r characters (because Regex is cool).
+            // Actually, it is because '.Split' only works with chars, so it cannot split at an occurence of "/r/n"... since that is a string...
+
+            gameState = Regex.Replace(gameState, @"\r", "");
+            world.rows = Convert.ToInt32(gameState.Split('\n')[0].Split(' ')[0]); // Find row value
+            world.cols = Convert.ToInt32(gameState.Split('\n')[0].Split(' ')[1]); // Find column value
+            world.turnNum = Convert.ToInt32(gameState.Split('\n')[0].Split(' ')[2]); // Find turn number
+            world.numVillages = Convert.ToInt32(gameState.Split('\n')[0].Split(' ')[3]);
+            world.numShrines = Convert.ToInt32(gameState.Split('\n')[0].Split(' ')[2]);
+
+            world.hawkPosition.row = Convert.ToInt32(gameState.Split('\n')[1].Split(' ')[0]);
+            world.hawkPosition.col = Convert.ToInt32(gameState.Split('\n')[1].Split(' ')[1]);
+
+            world.maejaPosition.row = Convert.ToInt32(gameState.Split('\n')[2].Split(' ')[0]);
+            world.maejaPosition.col = Convert.ToInt32(gameState.Split('\n')[2].Split(' ')[1]);
+
+            world.questPosition.row = Convert.ToInt32(gameState.Split('\n')[3].Split(' ')[0]);
+            world.questPosition.col = Convert.ToInt32(gameState.Split('\n')[3].Split(' ')[1]);
+
+
+            world.aurora.pos.row = Convert.ToInt32(gameState.Split('\n')[4].Split(' ')[0]); // Find aurora's row position
+            world.aurora.pos.col = Convert.ToInt32(gameState.Split('\n')[4].Split(' ')[1]); // Find aurora's col position
+            world.aurora.health = Convert.ToInt32(gameState.Split('\n')[5]); // Find aurora's health
+            world.aurora.maxHealth = Convert.ToInt32(gameState.Split('\n')[6]); // Find aurora's maximum health
+            world.aurora.attack = Array.ConvertAll(gameState.Split('\n')[7].Split(' '), s => int.Parse(s)); // Find aurora's attack stats
+            world.spells = Array.ConvertAll(gameState.Split('\n')[8].Split(' '), s => int.Parse(s)); // Find aurora's collected spells
+            world.gold = Convert.ToInt32(gameState.Split('\n')[9]); // Find aurora's gold
+            world.trollKing.pos.row = Convert.ToInt32(gameState.Split('\n')[10].Split(' ')[0]);
+            world.trollKing.pos.col = Convert.ToInt32(gameState.Split('\n')[10].Split(' ')[1]);
+            world.trollKing.health = Convert.ToInt32(gameState.Split('\n')[11]);
+            world.trollKing.maxHealth = Convert.ToInt32(gameState.Split('\n')[12]);
+            world.trollKing.attack = Array.ConvertAll(gameState.Split('\n')[13].Split(' '), s => int.Parse(s));
+            world.wolves.pos.row = Convert.ToInt32(gameState.Split('\n')[14].Split(' ')[0]);
+            world.wolves.pos.col = Convert.ToInt32(gameState.Split('\n')[14].Split(' ')[1]);
+            world.wolves.health = Convert.ToInt32(gameState.Split('\n')[15]);
+            world.wolves.maxHealth = Convert.ToInt32(gameState.Split('\n')[16]);
+            world.wolves.attack = Array.ConvertAll(gameState.Split('\n')[17].Split(' '), s => int.Parse(s));
+            // Get village positions
+            string[] tempArray = Array.ConvertAll(gameState.Split('\n')[18].Split(','), s => s);
+            world.villagePositions = new Position[tempArray.Length]; // Initialise world.villagePositions
+            for (int i = 0; i < tempArray.Length; i++)
+            {
+                if (tempArray[i] != "") // Doesn't actually need this line (but just a precaution since another block needed it).
+                {
+                    world.villagePositions[i].row = Convert.ToInt32(tempArray[i].Split(' ')[0]);
+                    world.villagePositions[i].col = Convert.ToInt32(tempArray[i].Split(' ')[1]);
+                }
+            }
+            // Get destroyed village positions
+            tempArray = Array.ConvertAll(gameState.Split('\n')[19].Split(','), s => s);
+
+            world.destroyedVillages = new List<Position>(); // Initialise world.destroyedVillages
+            Position tempPos = new Position();
+            for (int i = 0; i < tempArray.Length; i++)
+            {
+                // This block of code was the one which needed the line below (mentioned near here),
+                // since sometimes the input will be empty when no villages have been destroyed.
+                if (tempArray[i] != "") // Splitting empty string results in "" (so it must be skipped).
+
+                {
+                    tempPos.row = Convert.ToInt32(tempArray[i].Split(' ')[0]);
+                    tempPos.col = Convert.ToInt32(tempArray[i].Split(' ')[1]);
+                    world.destroyedVillages.Add(tempPos);
+                }
+            }
+            // Generate the first target for the Troll King
+            world.targetVillagePosition = world.villagePositions[random.Next() % world.villagePositions.Length];
+
+            // Get shrine positions
+            tempArray = Array.ConvertAll(gameState.Split('\n')[20].Split(','), s => s);
+            world.shrines = new Shrine[tempArray.Length]; // Initialise world.shrines
+            for (int i = 0; i < tempArray.Length; i++)
+            {
+                if (tempArray[i] != "") // Same idea... doesn't actually need it, but just a precaution.
+                {
+                    world.shrines[i].pos.row = Convert.ToInt32(tempArray[i].Split(' ')[0]);
+                    world.shrines[i].pos.col = Convert.ToInt32(tempArray[i].Split(' ')[1]);
+                }
+            }
+            // Get whether the shrines are solved
+            tempArray = Array.ConvertAll(gameState.Split('\n')[21].Split(' '), s => s);
+            for (int i = 0; i < tempArray.Length; i++)
+            {
+                if (tempArray[i] != "")
+                {
+                    world.shrines[i].solved = Convert.ToInt32(tempArray[i]);
+                }
+            }
+
+
+
+            ICON_WIDTH = (int)Math.Floor(MAP_WIDTH / Convert.ToDouble(world.cols));
+            ICON_HEIGHT = (int)Math.Floor(MAP_HEIGHT / Convert.ToDouble(world.rows));
+            ICON_WIDTH = Math.Min(ICON_HEIGHT, ICON_WIDTH);
+            ICON_HEIGHT = Math.Min(ICON_HEIGHT, ICON_WIDTH);
+            MAP_HEIGHT = ICON_HEIGHT * world.rows;
+            MAP_WIDTH = ICON_WIDTH * world.cols;
+        }
+        public static void GenerateDefaultValues()
+        {
+            /* This function generates default values to allow the update timer to work with variables not actually created yet.
+             */
+            world.rows = 1;
+            world.cols = 1;
+            world.aurora.attack = new int[3];
+            world.aurora.attack[0] = 0;
+            world.aurora.attack[1] = 0;
+            world.aurora.attack[2] = 0;
+            world.aurora.health = 1;
+            world.aurora.maxHealth = 1;
+            world.trollKing.maxHealth = 1;
+            world.trollKing.health = 1;
+            world.wolves.maxHealth = 1;
+            world.wolves.health = 1;
+            world.turnNum = 0;
+
+
+        }
+        public static void NextTurn()
+        {
+            /* This is the function which is run for each turn. This function is run repeatedly to start each
+             * turn in the game. The user runs this function with a button, but anti-cheat methods are implemented
+             * to stop users exploiting the fact that they control when the turn "rolls over".
+             * 
+             * The functions which it does include:
+             * updating the world.
+             * showing any important messages to the user.
+             * moving Aurora (the player).
+             * doing any interactions important for fighting or villages.
+             * stopping the game if it is over.
+             * 
+             */
+            hawkOmniscience = false;
+            UpdateBackgroundMusic();
+            bool trollKingAlive = world.trollKing.health > 0;
+            bool auroraAlive = world.aurora.health > 0;
+            if (!(auroraAlive && trollKingAlive && world.villagePositions.Length > 0))
+            {
+                gameOver = true;
+                NormalUI.Shutdown();
+            }
+            else
+            {
+                if (fighting)
+                {
+                    fighting = DoFightTurn();
+                }
+                else
+                {
+                    world.turnNum += 1;
+                    UpdateWorld();
+                    DoMessages();
+                    MoveAurora();
+                    CalcTurnEvents();
+
+                }
+            }
+
         }
         [System.Runtime.InteropServices.DllImport("gdi32.dll")]
         public static extern bool DeleteObject(IntPtr hObject); // add this function to dispose variables to prevent memory leaks
@@ -1842,14 +1823,16 @@ namespace Trurene_RPG
     {
         /* A class for custom message boxes... cause they're better than the normies.
          * It has definitions for different types of message boxes including:
-         * message boxes with text entry.
-         * message boxes themed for a warning sign.
-         * message boxes themed for a success sign.
+         * message boxes with a text entry.
+         * message boxes with confirmations.
+         * message boxes themes.
          * 
          */
 
         public static bool ShowConfirmation(string text,string caption)
         {
+            /* This function creates a message box with a YES and NO button and returns which one the user clicked.
+             */
             Console.WriteLine(text);
             Form messageBox = new Form()
             {
@@ -1876,6 +1859,8 @@ namespace Trurene_RPG
         }
         public static string ShowTextEntry(string text, string caption)
         {
+            /* This function creates a message box which takes in a text input and returns that.
+             */
             Console.WriteLine(text);
             Form messageBox = new Form()
             {
@@ -1899,9 +1884,10 @@ namespace Trurene_RPG
 
             return messageBox.ShowDialog() == DialogResult.OK ? textBox.Text : "";
         }
-
         public static void ShowText (string text, string caption, System.Drawing.Color backColor, System.Drawing.Color foreColor)
         {
+            /* This function creates a message box with just text.
+             */
             Console.WriteLine(text);
             Form messageBox = new Form()
             {
