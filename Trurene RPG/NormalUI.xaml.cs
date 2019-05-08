@@ -41,17 +41,26 @@ namespace Trurene_RPG
         public NormalUI()
         {
 
-
             // Start the timer to continually update the UI
-            System.Timers.Timer EverythingUpdaterTimer = new System.Timers.Timer(); 
-            EverythingUpdaterTimer.Elapsed += new ElapsedEventHandler(UpdateEverything);
-            EverythingUpdaterTimer.Interval = 500; // this is a very costly function to run, so it has a reasonable time interval
-            EverythingUpdaterTimer.Enabled = true;
+            System.Timers.Timer UpdateEverythingTimer = new System.Timers.Timer();
+            UpdateEverythingTimer.Elapsed += new ElapsedEventHandler(UpdateEverything);
+            UpdateEverythingTimer.Interval = 500; // this is a very costly function to run, so it has a reasonable time interval
+            UpdateEverythingTimer.Enabled = true;
             // Start the timer to autosave
             System.Timers.Timer SaveTimer = new System.Timers.Timer();
-            SaveTimer.Elapsed += new ElapsedEventHandler(Autosave);
+            SaveTimer.Elapsed += new ElapsedEventHandler(AutoSave);
             SaveTimer.Interval = 60000; // every minute 
             SaveTimer.Enabled = true;
+            // Start the timer to autoprepare
+            System.Timers.Timer PrepareTimer = new System.Timers.Timer();
+            PrepareTimer.Elapsed += new ElapsedEventHandler(AutoPrepare);
+            PrepareTimer.Interval = 500; 
+            PrepareTimer.Enabled = true;
+            // Start the timer to update notifications
+            System.Timers.Timer UpdateNotificationsTimer = new System.Timers.Timer();
+            UpdateNotificationsTimer.Elapsed += new ElapsedEventHandler(UpdateNotifications);
+            UpdateNotificationsTimer.Interval = 500; 
+            UpdateNotificationsTimer.Enabled = true;
             // Start the UI
             InitializeComponent();
 
@@ -76,207 +85,76 @@ namespace Trurene_RPG
             try
             {
                 Program.Save(CustomMessageBox.ShowTextEntry("SAVE", "Filename"));
-                CustomMessageBox.ShowText("The game was successfully saved!", "Success", SUCCESS_BACK, SUCCESS_FORE);
+                Program.AddNotification("The game was successfully saved!\n", new DependencyProperty[] { TextElement.ForegroundProperty }, new object[] { Brushes.PaleGreen });
+                
 
             }
             catch
             {
-                CustomMessageBox.ShowText("Filename is invalid!", "SAVE ERROR", WARNING_BACK, WARNING_FORE);
+                Program.AddNotification("The save filename is invalid!\n", new DependencyProperty[] { TextElement.ForegroundProperty }, new object[] { Brushes.PaleVioletRed });
+                
             }
-        }
-        public void NextTurnButtonClick(object sender, RoutedEventArgs e)
-        {
-            Program.NextTurn(); // Basically does every single important function for the Program.
         }
 
         // Movement buttons
-        public void NorthButtonClick(object sender, RoutedEventArgs e)
+        public void WKeyPress(object sender, RoutedEventArgs e)
         {
-            Program.moveAction = "North";
-            if (!Convert.ToBoolean(checkConfirmActions.IsChecked))
+            if (!Program.fighting)
             {
+                Program.moveAction = "North";
+                Program.NextTurn();
+            }
+            else
+            {
+                Program.fightAction = "Wait"; // this basically lets the enemy have a free turn
                 Program.NextTurn();
             }
         }
-        public void SouthButtonClick(object sender, RoutedEventArgs e)
+        public void SKeyPress(object sender, RoutedEventArgs e)
         {
-            Program.moveAction = "South";
-            if (!Convert.ToBoolean(checkConfirmActions.IsChecked))
+            if (!Program.fighting)
             {
+                Program.moveAction = "South";
+                Program.NextTurn();
+            }
+            else
+            {
+                Program.fightAction = "Strike";
                 Program.NextTurn();
             }
         }
-        public void EastButtonClick(object sender, RoutedEventArgs e)
+        public void AKeyPress(object sender, RoutedEventArgs e)
         {
-            Program.moveAction = "East";
-            if (!Convert.ToBoolean(checkConfirmActions.IsChecked))
+            if (!Program.fighting)
             {
+                Program.moveAction = "West";
                 Program.NextTurn();
             }
         }
-        public void WestButtonClick(object sender, RoutedEventArgs e)
+        public void DKeyPress(object sender, RoutedEventArgs e)
         {
-            Program.moveAction = "West";
-            if (!Convert.ToBoolean(checkConfirmActions.IsChecked))
+            if (!Program.fighting)
             {
+                Program.moveAction = "East";
+                Program.NextTurn();
+            }
+            else
+            {
+                Program.fightAction = "Strike";
                 Program.NextTurn();
             }
         }
-        // Fighting buttons
-        public void StrikeButtonClick(object sender, RoutedEventArgs e)
+        public void RKeyPress(object sender, RoutedEventArgs e)
         {
-            Program.fightAction = "Strike";
-            if (!Convert.ToBoolean(checkConfirmActions.IsChecked))
+            if (Program.fighting)
             {
-                Program.NextTurn();
-            }
-
-        }
-        public void RetreatButtonClick(object sender, RoutedEventArgs e)
-        {
-            Program.fightAction = "Retreat";
-            if (!Convert.ToBoolean(checkConfirmActions.IsChecked))
-            {
-                Program.NextTurn();
-            }
-
-        }
-        public void PrepareButtonClick(object sender, RoutedEventArgs e)
-        {
-            Program.fightAction = "Prepare";
-            if (!Convert.ToBoolean(checkConfirmActions.IsChecked))
-            {
+                Program.fightAction = "Strike";
                 Program.NextTurn();
             }
         }
 
 
-        // Update function (very important)
-        public void UpdateEverything(object source, ElapsedEventArgs e) 
-        {
 
-
-            try // Statistics and map (won't work at the start before they have been declared)
-            {
-            Dispatcher.Invoke(() =>
-            {
-                // Update the map (height and width in the case of a load)
-                Map.Height = MAP_HEIGHT;
-                Map.Width = MAP_WIDTH;
-                Map.Source = Program.CalculateMap();
-                
-                // Update the action text
-                MovementActionTextBlock.Text = Program.moveAction;
-                FightingActionTextBlock.Text = Program.fightAction;
-                // Update the map (height and width in the case of a load)
-                Map.Height = MAP_HEIGHT;
-                Map.Width = MAP_WIDTH;
-                Map.Source = Program.CalculateMap();
-
-                // Update miscellanous variables
-                GoldTextBlock.Text = "Gold: " + Convert.ToString(Program.world.gold);
-                TurnTextBlock.Text = "Turn: " + Convert.ToString(Program.world.turnNum);
-                TickTextBlock.Text = "Tick: " + Convert.ToString(Program.tick);
-
-                // Update Aurora related variables
-                AuroraAccuracyTextBlock.Text = "Accuracy:\t" + Convert.ToString(Program.world.aurora.attack[0]);
-                AuroraHealthTextBlock.Text = "Health:\t" + Convert.ToString(Program.world.aurora.health);
-                AuroraMaxHealthTextBlock.Text = "Max Health:\t" + Convert.ToString(Program.world.aurora.maxHealth);
-                AuroraPowerTextBlock.Text = "Power:\t" + Convert.ToString(Program.world.aurora.attack[1]);
-                AuroraPreparednessTextBlock.Text = "Preparedness:\t" + Convert.ToString(Program.auroraPreparedness);
-                AuroraTimeTextBlock.Text = "Time:\t" + Convert.ToString(Program.world.aurora.attack[2]);
-
-                // Update the enemy's variables
-                if (Program.fighting)
-                {
-                    EnemyAccuracyTextBlock.Text = "Accuracy:\t" + Convert.ToString(Program.enemy.attack[0]);
-                    EnemyHealthTextBlock.Text = "Health:\t" + Convert.ToString(Program.enemy.health);
-                    EnemyMaxHealthTextBlock.Text = "Max Health:\t" + Convert.ToString(Program.enemy.maxHealth);
-                    EnemyPowerTextBlock.Text = "Power:\t" + Convert.ToString(Program.enemy.attack[1]);
-                    EnemyPreparednessTextBlock.Text = "Preparedness:\t" + Convert.ToString(Program.enemyPreparedness);
-                    EnemyTimeTextBlock.Text = "Time:\t" + Convert.ToString(Program.enemy.attack[2]);
-
-                    EnemyAccuracyTextBlock.Background = Brushes.OrangeRed;
-                    EnemyHealthTextBlock.Background = Brushes.OrangeRed;
-                    EnemyMaxHealthTextBlock.Background = Brushes.OrangeRed;
-                    EnemyPowerTextBlock.Background = Brushes.OrangeRed;
-                    EnemyPreparednessTextBlock.Background = Brushes.OrangeRed;
-                    EnemyTimeTextBlock.Background = Brushes.OrangeRed;
-                    EnemyTextBlock.Background = Brushes.OrangeRed;
-
-                    AuroraAccuracyTextBlock.Background = Brushes.LightGreen;
-                    AuroraHealthTextBlock.Background = Brushes.LightGreen;
-                    AuroraMaxHealthTextBlock.Background = Brushes.LightGreen;
-                    AuroraPowerTextBlock.Background = Brushes.LightGreen;
-                    AuroraPreparednessTextBlock.Background = Brushes.LightGreen;
-                    AuroraTimeTextBlock.Background = Brushes.LightGreen;
-                    AuroraTextBlock.Background = Brushes.LightGreen;
-
-                    PrepareButton.Background = Brushes.LightGoldenrodYellow;
-                    StrikeButton.Background = Brushes.LightGoldenrodYellow;
-                    RetreatButton.Background = Brushes.LightGoldenrodYellow;
-                    NorthButton.Background = Brushes.Transparent;
-                    SouthButton.Background = Brushes.Transparent;
-                    EastButton.Background = Brushes.Transparent;
-                    WestButton.Background = Brushes.Transparent;
-                }
-                else
-                {
-                    EnemyAccuracyTextBlock.Text = "[Accuracy]";
-                    EnemyHealthTextBlock.Text = "[Health]";
-                    EnemyMaxHealthTextBlock.Text = "[Max Health]";
-                    EnemyPowerTextBlock.Text = "[Power]";
-                    EnemyPreparednessTextBlock.Text = "[Preparedness]";
-                    EnemyTimeTextBlock.Text = "[Time]";
-
-                    EnemyAccuracyTextBlock.Background = Brushes.Transparent;
-                    EnemyHealthTextBlock.Background = Brushes.Transparent;
-                    EnemyMaxHealthTextBlock.Background = Brushes.Transparent;
-                    EnemyPowerTextBlock.Background = Brushes.Transparent;
-                    EnemyPreparednessTextBlock.Background = Brushes.Transparent;
-                    EnemyTimeTextBlock.Background = Brushes.Transparent;
-                    EnemyTextBlock.Background = Brushes.Transparent;
-
-                    AuroraAccuracyTextBlock.Background = Brushes.Transparent;
-                    AuroraHealthTextBlock.Background = Brushes.Transparent;
-                    AuroraMaxHealthTextBlock.Background = Brushes.Transparent;
-                    AuroraPowerTextBlock.Background = Brushes.Transparent;
-                    AuroraPreparednessTextBlock.Background = Brushes.Transparent;
-                    AuroraTimeTextBlock.Background = Brushes.Transparent;
-                    AuroraTextBlock.Background = Brushes.Transparent;
-
-                    PrepareButton.Background = Brushes.Transparent;
-                    StrikeButton.Background = Brushes.Transparent;
-                    RetreatButton.Background = Brushes.Transparent;
-                    NorthButton.Background = Brushes.LightGoldenrodYellow;
-                    SouthButton.Background = Brushes.LightGoldenrodYellow;
-                    EastButton.Background = Brushes.LightGoldenrodYellow;
-                    WestButton.Background = Brushes.LightGoldenrodYellow;
-                }
-                
-
-            });
-            
-
-            }
-            catch
-            {
-                // couldn't update UI
-            }
-
-
-        }
-
-        public void Autosave(object sender, ElapsedEventArgs e)
-        {
-            Dispatcher.Invoke(() =>
-            {
-                if (Convert.ToBoolean(checkAutosave.IsChecked))
-                {
-                    Program.Save("autosave.txt");
-                }
-            });
-        }
 
         public void TutorialButtonClick(object sender, RoutedEventArgs e)
         {
@@ -285,7 +163,7 @@ namespace Trurene_RPG
              */
 
             SolidColorBrush color = Brushes.Yellow; // The color which the area is highlighted with
-            
+
             // How you win
             CustomMessageBox.ShowText("The way that you win is by killing the TROLL KING before he destroys every VILLAGE without dying.", "TUTORIAL", NORMAL_BACK, NORMAL_FORE);
             CustomMessageBox.ShowText("You can get stronger by spending GOLD on weapons from MERCHANTS in VILLAGES.", "TUTORIAL", NORMAL_BACK, NORMAL_FORE);
@@ -308,7 +186,7 @@ namespace Trurene_RPG
 
             AuroraPreparednessTextBlock.Background = color;
             AuroraTimeTextBlock.Background = color;
-            CustomMessageBox.ShowText("When the PREPAREDNESS reaches the TIME value, you can strike.", "TUTORIAL", NORMAL_BACK, NORMAL_FORE);
+            CustomMessageBox.ShowText("You can only strike when you are prepared enough.", "TUTORIAL", NORMAL_BACK, NORMAL_FORE);
             Thread.Sleep(1000);
             AuroraPreparednessTextBlock.Background = Brushes.Transparent;
             AuroraTimeTextBlock.Background = Brushes.Transparent;
@@ -316,8 +194,205 @@ namespace Trurene_RPG
             // End
             CustomMessageBox.ShowText("Congratulations, this is the end of the tutorial. Good luck on saving Trurene...", "TUTORIAL", GOLD_BACK, GOLD_FORE);
 
-            
+
         }
+
+        // Functions on timers (repeated after certain interval)
+        public void UpdateEverything(object source, ElapsedEventArgs e)
+        {
+            /* This function updates every element of the UI based on the values in the Program class
+             */
+
+            try // Statistics and map (won't work at the start before they have been declared)
+            {
+                Dispatcher.Invoke(() =>
+                {
+                    // Update the map (height and width in the case of a load)
+                    Map.Height = MAP_HEIGHT;
+                    Map.Width = MAP_WIDTH;
+                    Map.Source = Program.CalculateMap();
+
+                    // Update the map (height and width in the case of a load)
+                    Map.Height = MAP_HEIGHT;
+                    Map.Width = MAP_WIDTH;
+                    Map.Source = Program.CalculateMap();
+
+                    // Update miscellanous variables
+                    GoldTextBlock.Text = "Gold: " + Convert.ToString(Program.world.gold);
+                    TurnTextBlock.Text = "Turn: " + Convert.ToString(Program.world.turnNum);
+                    TickTextBlock.Text = "Tick: " + Convert.ToString(Program.tick);
+
+                    // Update Aurora related variables
+                    AuroraAccuracyTextBlock.Text = "Accuracy:\t" + Convert.ToString(Program.world.aurora.attack[0]);
+                    AuroraHealthTextBlock.Text = "Health:\t" + Convert.ToString(Program.world.aurora.health);
+                    AuroraMaxHealthTextBlock.Text = "Max Health:\t" + Convert.ToString(Program.world.aurora.maxHealth);
+                    AuroraPowerTextBlock.Text = "Power:\t" + Convert.ToString(Program.world.aurora.attack[1]);
+                    AuroraPreparednessTextBlock.Text = "Preparedness:\t" + Convert.ToString(Program.auroraPreparedness);
+                    AuroraTimeTextBlock.Text = "Time:\t" + Convert.ToString(Program.world.aurora.attack[2]);
+
+                    // Update the enemy's variables
+                    if (Program.fighting)
+                    {
+                        EnemyAccuracyTextBlock.Text = "Accuracy:\t" + Convert.ToString(Program.enemy.attack[0]);
+                        EnemyHealthTextBlock.Text = "Health:\t" + Convert.ToString(Program.enemy.health);
+                        EnemyMaxHealthTextBlock.Text = "Max Health:\t" + Convert.ToString(Program.enemy.maxHealth);
+                        EnemyPowerTextBlock.Text = "Power:\t" + Convert.ToString(Program.enemy.attack[1]);
+                        EnemyPreparednessTextBlock.Text = "Preparedness:\t" + Convert.ToString(Program.enemyPreparedness);
+                        EnemyTimeTextBlock.Text = "Time:\t" + Convert.ToString(Program.enemy.attack[2]);
+
+                        EnemyAccuracyTextBlock.Background = Brushes.OrangeRed;
+                        EnemyHealthTextBlock.Background = Brushes.OrangeRed;
+                        EnemyMaxHealthTextBlock.Background = Brushes.OrangeRed;
+                        EnemyPowerTextBlock.Background = Brushes.OrangeRed;
+                        EnemyPreparednessTextBlock.Background = Brushes.OrangeRed;
+                        EnemyTimeTextBlock.Background = Brushes.OrangeRed;
+                        EnemyTextBlock.Background = Brushes.OrangeRed;
+
+                        AuroraAccuracyTextBlock.Background = Brushes.LightGreen;
+                        AuroraHealthTextBlock.Background = Brushes.LightGreen;
+                        AuroraMaxHealthTextBlock.Background = Brushes.LightGreen;
+                        AuroraPowerTextBlock.Background = Brushes.LightGreen;
+                        AuroraPreparednessTextBlock.Background = Brushes.LightGreen;
+                        AuroraTimeTextBlock.Background = Brushes.LightGreen;
+                        AuroraTextBlock.Background = Brushes.LightGreen;
+
+                        WaitButton.Background = Brushes.LightGoldenrodYellow;
+                        RetreatButton.Background = Brushes.LightGoldenrodYellow;
+                        NorthButton.Background = Brushes.Transparent;
+                        SouthButton.Background = Brushes.Transparent;
+                        EastButton.Background = Brushes.Transparent;
+                        WestButton.Background = Brushes.Transparent;
+
+                        if (Program.auroraPreparedness < Program.world.aurora.attack[2])
+                        {
+                            StrikeButton.Content = "Prepare";
+                            StrikeButton.Background = Brushes.OrangeRed;
+                        }
+                        else
+                        {
+                            StrikeButton.Content = "Strike";
+                            StrikeButton.Background = Brushes.LightGreen;
+                        }
+                    }
+                    else
+                    {
+                        EnemyAccuracyTextBlock.Text = "[Accuracy]";
+                        EnemyHealthTextBlock.Text = "[Health]";
+                        EnemyMaxHealthTextBlock.Text = "[Max Health]";
+                        EnemyPowerTextBlock.Text = "[Power]";
+                        EnemyPreparednessTextBlock.Text = "[Preparedness]";
+                        EnemyTimeTextBlock.Text = "[Time]";
+
+                        EnemyAccuracyTextBlock.Background = Brushes.Transparent;
+                        EnemyHealthTextBlock.Background = Brushes.Transparent;
+                        EnemyMaxHealthTextBlock.Background = Brushes.Transparent;
+                        EnemyPowerTextBlock.Background = Brushes.Transparent;
+                        EnemyPreparednessTextBlock.Background = Brushes.Transparent;
+                        EnemyTimeTextBlock.Background = Brushes.Transparent;
+                        EnemyTextBlock.Background = Brushes.Transparent;
+
+                        AuroraAccuracyTextBlock.Background = Brushes.Transparent;
+                        AuroraHealthTextBlock.Background = Brushes.Transparent;
+                        AuroraMaxHealthTextBlock.Background = Brushes.Transparent;
+                        AuroraPowerTextBlock.Background = Brushes.Transparent;
+                        AuroraPreparednessTextBlock.Background = Brushes.Transparent;
+                        AuroraTimeTextBlock.Background = Brushes.Transparent;
+                        AuroraTextBlock.Background = Brushes.Transparent;
+
+                        WaitButton.Background = Brushes.Transparent;
+                        StrikeButton.Background = Brushes.Transparent;
+                        RetreatButton.Background = Brushes.Transparent;
+                        NorthButton.Background = Brushes.LightGoldenrodYellow;
+                        SouthButton.Background = Brushes.LightGoldenrodYellow;
+                        EastButton.Background = Brushes.LightGoldenrodYellow;
+                        WestButton.Background = Brushes.LightGoldenrodYellow;
+                    }
+
+
+                });
+
+
+            }
+            catch
+            {
+                // couldn't update UI
+            }
+
+
+        }
+        public void AutoSave(object sender, ElapsedEventArgs e)
+        {
+            Dispatcher.Invoke(() =>
+            {
+                if (Convert.ToBoolean(checkAutoSave.IsChecked))
+                {
+                    Program.Save("autosave.txt");
+                }
+            });
+        }
+
+        public void AutoPrepare(object sender, ElapsedEventArgs e)
+        {
+            Dispatcher.Invoke(() =>
+            {
+                if (Program.fighting && Convert.ToBoolean(checkAutoPrepare.IsChecked))
+                {
+                    if (Program.fightAction != "Retreat" && Program.auroraPreparedness < Program.world.aurora.attack[2] && Program.enemyPreparedness < Program.enemy.attack[2])
+                    {
+                        Program.fightAction = "Prepare"; // Automatically set it to prepare
+                        Program.DoFightTurn();
+                    }
+                }
+            });
+        }
+        public void KeyDownHandler(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            /* This function handles what to do when certain keys are pressed
+             */
+            if (e.Key == Key.S)
+            {
+                SKeyPress(null,null);
+            }
+            if (e.Key == Key.W)
+            {
+                WKeyPress(null, null);
+            }
+            if (e.Key == Key.A)
+            {
+                AKeyPress(null, null);
+            }
+            if (e.Key == Key.D)
+            {
+                DKeyPress(null, null);
+            }
+            if (e.Key == Key.R)
+            {
+                RKeyPress(null, null);
+            }
+        }
+        public void UpdateNotifications(object sender, ElapsedEventArgs e)
+        {
+            Dispatcher.Invoke(() =>
+            {
+                foreach (Program.FormattedText formattedText in Program.notificationsQueue)
+                {
+                    // Create the run of text
+                    TextRange textRange = new TextRange(notificationsRTF.Document.ContentEnd, notificationsRTF.Document.ContentEnd)
+                    {
+                        Text = formattedText.text
+                    };
+                    foreach (var textProperty in formattedText.textProperties)
+                    {
+                        textRange.ApplyPropertyValue(textProperty.property, textProperty.value);
+                    }
+
+                }
+                Program.notificationsQueue = new List<Program.FormattedText>(); // Empty the queue
+                notificationsRTF.ScrollToEnd(); // scroll to the bottom
+            });
+        }
+
+
 
 
     }

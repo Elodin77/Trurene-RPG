@@ -35,11 +35,14 @@ using System.Windows.Media;
 using System.Linq;
 using System.Windows.Forms;
 using static Trurene_RPG.Constants;
+
 using System.Runtime.InteropServices;
 using System.Diagnostics;
 using System.Windows.Threading;
 using Console = Colorful.Console;
 using System.Media;
+using System.Windows.Documents;
+using Brushes = System.Windows.Media.Brushes;
 
 namespace Trurene_RPG
 {
@@ -84,12 +87,12 @@ namespace Trurene_RPG
                 {
                     try
                     {
-                        Console.Write("World size (number between 5 and 15): ");
+                        Console.Write("World size (number between 7 and 12): ");
                         enteredSize = Convert.ToInt32(Console.ReadLine());
                         completed = true;
                     }
                     catch { }
-                } while (!completed || enteredSize < 5 || enteredSize > 15);
+                } while (!completed || enteredSize < 7 || enteredSize > 12);
                 GenerateRandomWorld(enteredSize);
             }
             else
@@ -184,8 +187,6 @@ namespace Trurene_RPG
             // start sound
             backgroundMusic = new SoundPlayer(@"data/audio/background1.wav");
             backgroundMusic.PlayLooping();
-            NormalUI.StartupUri = new Uri("NormalUI.xaml", System.UriKind.Relative); // Make the app run code on startup
-            NormalUI.Run(); // Run the app
 
             // Start the game
             NormalUI.StartupUri = new Uri("NormalUI.xaml", System.UriKind.Relative); // Make the app run code on startup
@@ -351,10 +352,7 @@ namespace Trurene_RPG
                     map[world.questPosition.row][world.questPosition.col] = QUEST_ICON;
                 }
             }
-            catch
-            {
-                Log("Coudln't load map");
-            }
+            catch { }
 
 
 
@@ -594,6 +592,7 @@ namespace Trurene_RPG
             }
             else
             {
+                AddNotification("That is an invalid move!\n", new DependencyProperty[] { TextElement.ForegroundProperty }, new object[] { Brushes.Red });
                 CustomMessageBox.ShowText("That is an invalid move!", "MOVEMENT ERROR", WARNING_BACK, WARNING_FORE);
             }
 
@@ -604,7 +603,7 @@ namespace Trurene_RPG
              * It is essentially the squares above, below and to the left and right.
              */
             List<Position> validMoves = new List<Position>();
-            if (pos.row < world.rows-2)
+            if (pos.row < world.rows-1)
             {
                 Position validPos = new Position();
                 validPos.row = pos.row + 1;
@@ -618,7 +617,7 @@ namespace Trurene_RPG
                 validPos.col = pos.col;
                 validMoves.Add(validPos);
             }
-            if (pos.col < world.cols - 2)
+            if (pos.col < world.cols - 1)
             {
                 Position validPos = new Position();
                 validPos.row = pos.row;
@@ -655,7 +654,7 @@ namespace Trurene_RPG
                 Creature trollKing = CharacterToCreature(world.trollKing);
                 enemy = trollKing;
                 fighting = true;
-                CustomMessageBox.ShowText("You have encountered the TROLL KING!!! Get ready to fight!", "FIGHTING", WARNING_BACK, WARNING_FORE);
+                AddNotification("You have encountered the TROLL KING!!!\n", new DependencyProperty[] { TextElement.ForegroundProperty, TextElement.FontWeightProperty }, new object[] { Brushes.Red, FontWeights.Bold });
                 fightingTrollKing = true;
                 somethingHappened = true;
             }
@@ -678,7 +677,8 @@ namespace Trurene_RPG
                 Creature wolves = CharacterToCreature(world.wolves);
                 enemy = wolves;
                 fighting = true;
-                CustomMessageBox.ShowText("You have encountered a PACK OF WOLVES!!! Get ready to fight!", "FIGHTING", WARNING_BACK, WARNING_FORE);
+                AddNotification("You have encountered the WOLVES!!!\n", new DependencyProperty[] { TextElement.ForegroundProperty, TextElement.FontWeightProperty }, new object[] { Brushes.Red, FontWeights.Bold });
+                
                 fightingWolves = true;
                 somethingHappened = true;
             }
@@ -724,7 +724,8 @@ namespace Trurene_RPG
                 enemy.reward = (int) Math.Floor(SmallCreatureInfo.REWARD_MUTLIPLIER * enemy.maxHealth);
                 // Fight the small creature
                 fighting = true;
-                CustomMessageBox.ShowText("You have encountered a SMALL CREATURE!!! Get ready to fight!", "FIGHTING", WARNING_BACK, WARNING_FORE);
+                AddNotification("You have encountered a SMALL CREATURE!!!\n", new DependencyProperty[] { TextElement.ForegroundProperty, TextElement.FontWeightProperty }, new object[] { Brushes.Red, FontWeights.Bold });
+                
             }
             if (fightCreature == 2)
             {
@@ -738,7 +739,8 @@ namespace Trurene_RPG
                 enemy.reward = (int)Math.Floor(LargeCreatureInfo.REWARD_MUTLIPLIER * enemy.maxHealth);
                 // Fight the large creature
                 fighting = true;
-                CustomMessageBox.ShowText("You have encountered a LARGE CREATURE!!! Get ready to fight!", "FIGHTING", WARNING_BACK, WARNING_FORE);
+                AddNotification("You have encountered a LARGE CREATURE!!!\n", new DependencyProperty[] { TextElement.ForegroundProperty, TextElement.FontWeightProperty}, new object[] { Brushes.Red, FontWeights.Bold });
+                
 
             }
             // Regenerate Aurora's health
@@ -782,15 +784,15 @@ namespace Trurene_RPG
                 world.questPosition.row = -1;
                 world.questPosition.col = -1;
                 world.gold += random.Next(QuestInfo.MIN_REWARD, QuestInfo.MAX_REWARD);
-                CustomMessageBox.ShowText("The friend walked up to you and asked you to do a few jobs for them.", "MESSAGE", SUCCESS_BACK, SUCCESS_FORE);
                 PlaySound("coin.wav", 1.0);
-                CustomMessageBox.ShowText("Then they gave you a small pouch of gold. Wow.", "REWARD", GOLD_BACK, GOLD_FORE);
+                AddNotification("The friend walked up to you, you did a few jobs for them and they gave you a small pouch of gold. Wow.\n", new DependencyProperty[] { TextElement.ForegroundProperty }, new object[] { Brushes.Gold });
+
 
             }
             UpdateBackgroundMusic();
 
         }
-        static bool DoFightTurn()
+        public static bool DoFightTurn()
         {
             /* This function runs the interaction for the fighting. 
              * The enemy is a global variable so that the WPF application can access it.
@@ -805,143 +807,143 @@ namespace Trurene_RPG
             {
                 goblinArtefactUsed = true;
                 enemy.attack[0] -= 20;
-                CustomMessageBox.ShowText("The enemy loses 20% accuracy through the " + artefacts[GOBLIN_INDEX], "FIGHTING", SUCCESS_BACK, SUCCESS_FORE);
+                AddNotification("The enemy loses 20% accuracy through the " + artefacts[GOBLIN_INDEX]+"\n", new DependencyProperty[] { TextElement.ForegroundProperty }, new object[] { Brushes.Green });
             }
 
             auroraStrike = false;
             enemyStrike = false;
 
-            if (fightAction == "Strike" && auroraPreparedness < world.aurora.attack[2])
+            if (fightAction != "Retreat" && auroraPreparedness < world.aurora.attack[2])
             {
-                CustomMessageBox.ShowText("You are not prepared enough to do that! The value of your PREPAREDNESS must reach the value of TIME for your weapon.", "FIGHTING ERROR", WARNING_BACK, WARNING_FORE);
-
+                fightAction = "Prepare"; // Automatically set it to prepare
+            }
+            if (enemyPreparedness < enemy.attack[2])
+            {
+                enemyPreparedness += 1;
             }
             else
             {
-                if (enemyPreparedness < enemy.attack[2])
+                enemyPreparedness -= enemy.attack[2];
+                double prob = enemy.attack[0] / 100.0;
+                if (ProbabilityRandom(prob))
                 {
-                    enemyPreparedness += 1;
+                    enemyStrike = true;
+                }
+
+            }
+            // Do the entered action
+            if (fightAction == "Strike")
+            {
+                auroraPreparedness -= world.aurora.attack[2];
+                double prob = world.aurora.attack[0] / 100.0;
+                if (ProbabilityRandom(prob))
+                {
+                    auroraStrike = true;
                 }
                 else
                 {
-                    enemyPreparedness -= enemy.attack[2];
-                    double prob = enemy.attack[0] / 100.0;
-                    if (ProbabilityRandom(prob))
-                    {
-                        enemyStrike = true;
-                    }
-
-                }
-                // Do the entered action
-                if (fightAction == "Strike")
-                {
-                    auroraPreparedness -= world.aurora.attack[2];
-                    double prob = world.aurora.attack[0] / 100.0;
-                    if (ProbabilityRandom(prob))
-                    {
-                        auroraStrike = true;
-                    }
-                    else
-                    {
-                        PlaySound("miss.wav", 0.5);
-                        CustomMessageBox.ShowText("You miss!", "FIGHTING", WARNING_BACK, WARNING_FORE);
-                    }
-
-                }
-                if (fightAction == "Prepare")
-                {
-                    auroraPreparedness += 1;
-                }
-                if (fightAction == "Retreat")
-                {
-                    double prob = world.aurora.attack[0] / 100.0;
-                    if (ProbabilityRandom(prob))
-                    {
-                        CustomMessageBox.ShowText("You successfully retreated!", "FIGHTING", SUCCESS_BACK, SUCCESS_FORE);
-                        retreated = true;
-                        fighting = false;
-                    }
-                    else
-                    {
-                        CustomMessageBox.ShowText("You couldn't run away! Your retreat failed!", "FIGHTING", WARNING_BACK, WARNING_FORE);
-                    }
-                }
-                // Check if there was a simultaneous strike
-                if (auroraStrike && enemyStrike && simultaneousStrikes < NUM_TIMES_TO_SHATTER && !retreated)
-                {
-
-
-                    if (world.aurora.attack[1] > enemy.attack[1] && simultaneousStrikes != NUM_TIMES_TO_SHATTER)
-                    {
-                        PlaySound("parry.wav", 0.5);
-                        CustomMessageBox.ShowText("You striked at the same time and DAMAGED the enemy's weapon!", "FIGHTING", SUCCESS_BACK, SUCCESS_FORE);
-                        enemy.attack[1] = (int)Math.Floor(enemy.attack[1] * SIMULTANEOUS_STRIKE_DAMAGE);
-
-                    }
-                    else if (world.aurora.attack[1] > enemy.attack[1] && simultaneousStrikes == NUM_TIMES_TO_SHATTER)
-                    {
-                        PlaySound("parry.wav", 1.0);
-                        CustomMessageBox.ShowText("You striked at the same time and SHATTERED the enemy's weapon!", "FIGHTING", SUCCESS_BACK, SUCCESS_FORE);
-                        enemy.attack[1] = (int)Math.Floor(enemy.attack[1] * SHATTER_DAMAGE);
-
-                    }
-                    else if (world.aurora.attack[1] < enemy.attack[1] && simultaneousStrikes != NUM_TIMES_TO_SHATTER)
-                    {
-                        PlaySound("parry.wav", 0.5);
-                        CustomMessageBox.ShowText("You striked at the same time and your weapon was DAMAGED.", "FIGHTING", SUCCESS_BACK, SUCCESS_FORE);
-                        world.aurora.attack[1] = (int)Math.Floor(world.aurora.attack[1] * SIMULTANEOUS_STRIKE_DAMAGE);
-
-                    }
-                    else if (world.aurora.attack[1] < enemy.attack[1] && simultaneousStrikes == NUM_TIMES_TO_SHATTER)
-                    {
-                        PlaySound("parry.wav", 1.0);
-                        CustomMessageBox.ShowText("You striked at the same time and your weapon was SHATTERED", "FIGHTING", SUCCESS_BACK, SUCCESS_FORE);
-                        world.aurora.attack[1] = (int)Math.Floor(world.aurora.attack[1] * SHATTER_DAMAGE);
-
-                    }
-                    else
-                    {
-                        PlaySound("parry.wav", 0.5);
-                        CustomMessageBox.ShowText("You both striked at the same time and nobody took damage!", "FIGHTING", WARNING_BACK, WARNING_FORE);
-
-                    }
-                }
-                else if (auroraStrike && !retreated)
-                {
-                    enemy.health -= world.aurora.attack[1];
-                    PlaySound("damage.wav", 1.0);
-                    CustomMessageBox.ShowText("You hit the enemy!", "FIGHTING", SUCCESS_BACK, SUCCESS_FORE);
-                    if (world.spells[0] == 2)
-                    {
-                        int heal = (int)Math.Floor(world.aurora.attack[1] * VAMPIRE_HEAL);
-                        PlaySound("heal.wav", 1.0);
-                        CustomMessageBox.ShowText("You heal " + Convert.ToString(heal) + "HP through the " + artefacts[VAMPIRE_INDEX], "FIGHTING", SUCCESS_BACK, SUCCESS_FORE);
-                        world.aurora.health += heal;
-                        if (world.aurora.health > world.aurora.maxHealth)
-                        {
-                            world.aurora.health = world.aurora.maxHealth;
-                        }
-                    }
-                }
-                if (enemyStrike && !retreated && !auroraStrike)
-                {
-                    world.aurora.health -= enemy.attack[1];
-                    PlaySound("damage.wav", 1.0);
-                    CustomMessageBox.ShowText("The enemy hit you!", "FIGHTING", WARNING_BACK, WARNING_FORE);
-                }
-                else if (!retreated && !enemyStrike && enemyPreparedness==0)
-                {
                     PlaySound("miss.wav", 0.5);
-                    CustomMessageBox.ShowText("The enemy misses!", "FIGHTING", SUCCESS_BACK, SUCCESS_FORE);
+                    AddNotification("You miss!\n", new DependencyProperty[] { TextElement.ForegroundProperty }, new object[] { Brushes.Red });
+                    
+                }
+
+            }
+            if (fightAction == "Prepare")
+            {
+                auroraPreparedness += 1;
+            }
+            if (fightAction == "Retreat")
+            {
+                double prob = world.aurora.attack[0] / 100.0;
+                if (ProbabilityRandom(prob))
+                {
+                    AddNotification("You successfully retreat!\n", new DependencyProperty[] { TextElement.ForegroundProperty }, new object[] { Brushes.Green });
+                    
+                    retreated = true;
+                    fighting = false;
+                }
+                else
+                {
+                    AddNotification("Your retreat fails!\n", new DependencyProperty[] { TextElement.ForegroundProperty }, new object[] { Brushes.Red });
+                    
+                }
+            }
+            // Check if there was a simultaneous strike
+            if (auroraStrike && enemyStrike && simultaneousStrikes < NUM_TIMES_TO_SHATTER && !retreated)
+            {
+
+
+                if (world.aurora.attack[1] > enemy.attack[1] && simultaneousStrikes != NUM_TIMES_TO_SHATTER)
+                {
+                    PlaySound("parry.wav", 0.5);
+                    AddNotification("You strike simultaneously and DAMAGE the enemy's weapon!\n", new DependencyProperty[] { TextElement.ForegroundProperty }, new object[] { Brushes.Green });
+                    enemy.attack[1] = (int)Math.Floor(enemy.attack[1] * SIMULTANEOUS_STRIKE_DAMAGE);
+
+                }
+                else if (world.aurora.attack[1] > enemy.attack[1] && simultaneousStrikes == NUM_TIMES_TO_SHATTER)
+                {
+                    PlaySound("parry.wav", 1.0);
+                    AddNotification("You strike simultaneously and SHATTER the enemy's weapon!\n", new DependencyProperty[] { TextElement.ForegroundProperty }, new object[] { Brushes.DarkGreen });
+                    enemy.attack[1] = (int)Math.Floor(enemy.attack[1] * SHATTER_DAMAGE);
+
+                }
+                else if (world.aurora.attack[1] < enemy.attack[1] && simultaneousStrikes != NUM_TIMES_TO_SHATTER)
+                {
+                    PlaySound("parry.wav", 0.5);
+                    AddNotification("You strike simultaneously and DAMAGE your weapon!\n", new DependencyProperty[] { TextElement.ForegroundProperty }, new object[] { Brushes.Red });
+                    world.aurora.attack[1] = (int)Math.Floor(world.aurora.attack[1] * SIMULTANEOUS_STRIKE_DAMAGE);
+
+                }
+                else if (world.aurora.attack[1] < enemy.attack[1] && simultaneousStrikes == NUM_TIMES_TO_SHATTER)
+                {
+                    PlaySound("parry.wav", 1.0);
+                    AddNotification("You strike simultaneously and SHATTER your weapon!\n", new DependencyProperty[] { TextElement.ForegroundProperty }, new object[] { Brushes.DarkRed });
+                    world.aurora.attack[1] = (int)Math.Floor(world.aurora.attack[1] * SHATTER_DAMAGE);
+
+                }
+                else
+                {
+                    AddNotification("You strike simultaneously and nobody takes damage!\n", new DependencyProperty[] { TextElement.ForegroundProperty }, new object[] { Brushes.Purple});
+                    PlaySound("parry.wav", 0.5);
 
                 }
             }
+            else if (auroraStrike && !retreated)
+            {
+                enemy.health -= world.aurora.attack[1];
+                PlaySound("damage.wav", 1.0);
+                AddNotification("You hit the enemy!\n", new DependencyProperty[] { TextElement.ForegroundProperty }, new object[] { Brushes.DarkGreen });
+                
+                if (world.spells[0] == 2)
+                {
+                    int heal = (int)Math.Floor(world.aurora.attack[1] * VAMPIRE_HEAL);
+                    PlaySound("heal.wav", 1.0);
+                    AddNotification("You heal " + Convert.ToString(heal) + "HP through the " + artefacts[VAMPIRE_INDEX]+"\n", new DependencyProperty[] { TextElement.ForegroundProperty }, new object[] { Brushes.Green });
+                    world.aurora.health += heal;
+                    if (world.aurora.health > world.aurora.maxHealth)
+                    {
+                        world.aurora.health = world.aurora.maxHealth;
+                    }
+                }
+            }
+            if (enemyStrike && !retreated && !auroraStrike)
+            {
+                world.aurora.health -= enemy.attack[1];
+                PlaySound("damage.wav", 1.0);
+                AddNotification("The enemy hit you!\n", new DependencyProperty[] { TextElement.ForegroundProperty }, new object[] { Brushes.DarkRed });
+            }
+            else if (!retreated && !enemyStrike && enemyPreparedness==0)
+            {
+                PlaySound("miss.wav", 0.5);
+                AddNotification("The enemy misses!\n", new DependencyProperty[] { TextElement.ForegroundProperty }, new object[] { Brushes.Green });
+            }
+            
             if (enemy.health <= 0)
             {
                 enemy.health = 1; // To stop this happening multiple times.
                 world.gold += enemy.reward;
                 PlaySound("coin.wav", 1.0);
-                CustomMessageBox.ShowText("You found " + Convert.ToString(enemy.reward) + "G on the creature.", "GOLD", GOLD_BACK, GOLD_FORE);
+                AddNotification("You found " + Convert.ToString(enemy.reward) + "G on the creature!\n", new DependencyProperty[] { TextElement.ForegroundProperty }, new object[] { Brushes.Gold });
                 fighting = false;
                 goblinArtefactUsed = false;
             }
@@ -1263,22 +1265,26 @@ namespace Trurene_RPG
             if (Math.Abs(world.aurora.pos.row - world.trollKing.pos.row) > Math.Abs(world.aurora.pos.col - world.trollKing.pos.col)) {
                 if (world.aurora.pos.row > world.trollKing.pos.row)
                 {
-                    CustomMessageBox.ShowText("You see smoke to the NORTH. It must be the Troll King.", "MESSAGE", NORMAL_BACK, NORMAL_FORE);
+                    AddNotification("The Troll King is to the NORTH.\n", new DependencyProperty[] { TextElement.ForegroundProperty }, new object[] { Brushes.Blue });
+                    
                 }
                 else
                 {
-                    CustomMessageBox.ShowText("You see smoke to the SOUTH. It must be the Troll King.", "MESSAGE", NORMAL_BACK, NORMAL_FORE);
+                    AddNotification("The Troll King is to the SOUTH.\n", new DependencyProperty[] { TextElement.ForegroundProperty }, new object[] { Brushes.Blue });
+                    
                 }
             }
             else
             {
                 if (world.aurora.pos.col > world.trollKing.pos.col)
                 {
-                    CustomMessageBox.ShowText("You see smoke to the WEST. It must be the Troll King.", "MESSAGE", NORMAL_BACK, NORMAL_FORE);
+                    AddNotification("The Troll King is to the WEST.\n", new DependencyProperty[] { TextElement.ForegroundProperty }, new object[] { Brushes.Blue });
+                    
                 }
                 else
                 {
-                    CustomMessageBox.ShowText("You see smoke to the EAST. It must be the Troll King.","MESSAGE", NORMAL_BACK, NORMAL_FORE);
+                    AddNotification("The Troll King is to the EAST.\n", new DependencyProperty[] { TextElement.ForegroundProperty }, new object[] { Brushes.Blue });
+                    
                 }
             }
             if (DistanceBetween(world.aurora.pos,world.wolves.pos)<=1)
@@ -1329,6 +1335,10 @@ namespace Trurene_RPG
             {
                 possibleMoves = MoveCloserTo(world.trollKing.pos, world.targetVillagePosition);
                 
+            }
+            if (possibleMoves.Count() == 0) // sometimes the Troll King can be pinned in a corner, where he has nowhere to go
+            {
+                possibleMoves = MoveCloserTo(world.trollKing.pos, world.targetVillagePosition);
             }
             world.trollKing.pos = possibleMoves[random.Next(possibleMoves.Count)];
         }
@@ -1631,7 +1641,7 @@ namespace Trurene_RPG
         public static extern bool DeleteObject(IntPtr hObject); // add this function to dispose variables to prevent memory leaks
 
         // FANCY STUFF //
-        static void PrettyPrint(string text, int delay)
+        public static void PrettyPrint(string text, int delay)
         {
 
             /* This function prints text in a cool way.
@@ -1663,6 +1673,24 @@ namespace Trurene_RPG
                 }
             }
             Console.WriteLine();
+        }
+        public static void AddNotification(string text, DependencyProperty[] properties, object[] values)
+        {
+            /* This function "zips" properties with values (properties[i] goes with values[i]).
+             * It also adds the FormattedText to the notifications queue.
+             */
+            FormattedText formattedText = new FormattedText();
+            formattedText.text = text;
+            formattedText.textProperties = new List<TextProperty>();
+            TextProperty textProperty = new TextProperty();
+            for (int i = 0; i < properties.Length; i++)
+            {
+                textProperty = new TextProperty();
+                textProperty.property = properties[i];
+                textProperty.value = values[i];
+                formattedText.textProperties.Add(textProperty);
+            }
+            notificationsQueue.Add(formattedText); // Add the formattedText to the notifications queue
         }
         public static void FlushKeyboard() 
         {
@@ -1701,10 +1729,6 @@ namespace Trurene_RPG
             Key keyObject = (Key)k.ConvertFromString(keyString);
             return keyObject;
         }
-        public static void Log(string textToLog)
-        {
-            Console.WriteLine("LOG: " + textToLog);
-        }
         public static void PlaySound(string filename, double volume)
         {
             MediaPlayer myPlayer = new MediaPlayer();
@@ -1725,12 +1749,15 @@ namespace Trurene_RPG
             bitmapImage.EndInit();
             return bitmapImage;
         }
+
         // GLOBAL VARIABLES //
         // Overall vars
         public static string[] commands = {"/quit", "/hawk", "/maeja", "/save", "/load"}; // A list of commands...
         public static World world;
         public static Random random = new Random(); // Create a random object which is used for all random stuff
         public static System.Windows.Application NormalUI = new System.Windows.Application(); // Create a new application (WPF)
+        public static SoundPlayer backgroundMusic = new SoundPlayer(@"data/audio/background1.wav");
+        public static string backgroundMusicTrack = "normal";
 
         // Game vars
         public static bool gameOver = false; // This is checked each turn to make sure that the game is not over
@@ -1746,11 +1773,9 @@ namespace Trurene_RPG
         public static bool fightingWolves = false;
         public static bool goblinArtefactUsed = false;
         public static bool hawkOmniscience = false;
-        public static SoundPlayer backgroundMusic = new SoundPlayer(@"data/audio/background1.wav");
-        public static string backgroundMusicTrack = "normal";
+        public static List<FormattedText> notificationsQueue = new List<FormattedText>(); // This is the text which still needs to be added to the notifications
+
         
-
-
         // Data Structures
         public struct World
         {
@@ -1799,6 +1824,16 @@ namespace Trurene_RPG
         {
             public int row;
             public int col;
+        }
+        public struct FormattedText
+        {
+            public string text;
+            public List<TextProperty> textProperties;
+        }
+        public struct TextProperty
+        {
+            public DependencyProperty property;
+            public object value;
         }
 
     }

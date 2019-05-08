@@ -9,7 +9,8 @@
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"   
   Title="Trurene - The RPG" Height="600" Width="800"
   WindowStyle="SingleBorderWindow" ResizeMode="CanResizeWithGrip"  
-  WindowStartupLocation="CenterScreen" WindowState="Maximized">
+  WindowStartupLocation="CenterScreen" WindowState="Maximized" KeyDown="KeyDownHandler">
+
     <Grid TextBlock.FontSize="15" TextBlock.FontFamily="Comic Sans MS">
         <!-- First the grid is defined.-->
         <Grid.ColumnDefinitions>
@@ -55,33 +56,39 @@
         <TextBlock Grid.Row="1" x:Name="ControlsTextBlock" Text="Controls" FontSize="15" FontWeight="Bold"/>
         <Button Grid.Row="1" x:Name="LoadButton" Content="LOAD" Click="LoadButtonClick" Margin="0,66.5,307.5,84.5" Width="100" Height="40"/>
         <Button Grid.Row="1" x:Name="SaveButton" Content="SAVE" Click="SaveButtonClick" Margin="0,106.5,307.5,44.5" Width="100" Height="40"/>
-        <Button Grid.Row="1" x:Name="NextTurnButton" Content="NEXT TURN" Click="NextTurnButtonClick" Margin="0,26.5,307.5,124.5" Width="100" Height="40"/>
-        <Button Grid.Row="1" x:Name="NorthButton" Content="NORTH" Margin="245,39,94.5,189.5" Click="NorthButtonClick" Height="58" Width="58"/>
-        <Button Grid.Row="1" x:Name="SouthButton" Content="SOUTH" Margin="245,97,94.5,131.5" Click="SouthButtonClick" Height="58" Width="58"/>
-        <Button Grid.Row="1" x:Name="EastButton" Content="EAST" Margin="303,72,36.5,156.5" Click="EastButtonClick" Height="58" Width="58"/>
-        <Button Grid.Row="1" x:Name="WestButton" Content="WEST" Margin="187,72,152.5,156.5" Click="WestButtonClick" Height="58" Width="58"/>
-        <Button Grid.Row="1" x:Name="StrikeButton" Content="STRIKE" Margin="161,224,166.5,22.5" Click="StrikeButtonClick" Height="40" Width="70"/>
-        <Button Grid.Row="1" x:Name="PrepareButton" Content="PREPARE" Margin="231,224,96.5,22.5" Click="PrepareButtonClick" Height="40" Width="70"/>
-        <Button Grid.Row="1" x:Name="RetreatButton" Content="RETREAT" Margin="301,224,26.5,22.5" Click="RetreatButtonClick" Height="40" Width="70"/>
+        <Button Grid.Row="1" x:Name="NorthButton" Content="NORTH" Margin="245,39,94.5,189.5" Click="WKeyPress" Height="58" Width="58"/>
+        <Button Grid.Row="1" x:Name="SouthButton" Content="SOUTH" Margin="245,97,94.5,131.5" Click="SKeyPress" Height="58" Width="58"/>
+        <Button Grid.Row="1" x:Name="EastButton" Content="EAST" Margin="303,72,36.5,156.5" Click="DKeyPress" Height="58" Width="58"/>
+        <Button Grid.Row="1" x:Name="WestButton" Content="WEST" Margin="187,72,152.5,156.5" Click="AKeyPress" Height="58" Width="58"/>
+        <Button Grid.Row="1" x:Name="StrikeButton" Content="STRIKE" Margin="161,224,166.5,22.5" Click="SKeyPress" Height="40" Width="70"/>
+        <Button Grid.Row="1" x:Name="WaitButton" Content="WAIT" Margin="231,224,96.5,22.5" Click="WKeyPress" Height="40" Width="70"/>
+        <Button Grid.Row="1" x:Name="RetreatButton" Content="RETREAT" Margin="301,224,26.5,22.5" Click="RKeyPress" Height="40" Width="70"/>
         <Button Grid.Row="1" x:Name="TutorialButton" Content="TUTORIAL" Click="TutorialButtonClick" Height="40" Width="100" Margin="0,146.5,307.5,4.5"/>
 
         <!-- Bottom Right grid square. This contains other statistics not contained in the fighting squares.-->
         <StackPanel Grid.Row="1" Grid.Column="1">
             <TextBlock Text="[Turn Number]" x:Name="TurnTextBlock"/>
             <TextBlock Text="[Gold]" x:Name="GoldTextBlock"/>
-            <TextBlock>&#x0a;</TextBlock>
-            <TextBlock FontWeight="Bold" Text="Current Actions Set"/>
-            <TextBlock Text="[Fighting Action]" x:Name="FightingActionTextBlock"/>
-            <TextBlock Text="[Movement Action]" x:Name="MovementActionTextBlock"/>
+
         </StackPanel>
 
-        <StackPanel Grid.Row="0" Grid.Column="2">
-            <CheckBox x:Name="checkConfirmActions" IsChecked="False">Confirm Actions</CheckBox>
-            <CheckBox x:Name="checkAutosave" IsChecked="True">Auto Save</CheckBox>
-        </StackPanel>
+        <StackPanel Grid.Row="0" Grid.Column="2" Grid.RowSpan="2">
+            <CheckBox x:Name="checkAutoSave" IsChecked="True">Auto Save</CheckBox>
+            <CheckBox x:Name="checkAutoPrepare" IsChecked="True">Auto Prepare</CheckBox>
+            <!-- This is where the main notification text appears-->
+            <RichTextBox x:Name="notificationsRTF" ScrollViewer.VerticalScrollBarVisibility="Auto" Height="533" Width="199">
+                <FlowDocument x:Name="notificationsFlowDoc">
+                    <Paragraph>
+                        <!-- There is actually only 1 paragraph for all the text-->
+                    </Paragraph>
+                </FlowDocument>
+            </RichTextBox>
 
+        </StackPanel>
 
     </Grid>
+
+
 
 
 
