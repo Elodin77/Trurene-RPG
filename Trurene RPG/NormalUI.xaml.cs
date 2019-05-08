@@ -35,7 +35,6 @@ namespace Trurene_RPG
         // FUNCTIONS
         public NormalUI()
         {
-
             // Start the timer to continually update the UI
             UpdateEverythingTimer = new System.Timers.Timer();
             UpdateEverythingTimer.Elapsed += new ElapsedEventHandler(UpdateEverything);
@@ -81,8 +80,6 @@ namespace Trurene_RPG
             {
                 Program.Save(CustomMessageBox.ShowTextEntry("SAVE", "Filename"));
                 Program.AddNotification("The game was successfully saved!\n", new DependencyProperty[] { TextElement.ForegroundProperty }, new object[] { Brushes.PaleGreen });
-                
-
             }
             catch
             {

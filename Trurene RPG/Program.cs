@@ -1038,7 +1038,7 @@ namespace Trurene_RPG
                     
                 }
             }
-            if (DistanceBetween(world.aurora.pos,world.wolves.pos)<=1)
+            if (DistanceBetween(world.aurora.pos,world.wolves.pos)<=2)
             {
                 CustomMessageBox.ShowText("You hear the howl of wolves.", "MESSAGE", WARNING_BACK, WARNING_FORE);
             }
