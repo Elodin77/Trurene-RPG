@@ -57,9 +57,10 @@ namespace Trurene_RPG
 
             // Create default values
             GenerateDefaultValues();
+
             // Show the lore
             string lore = File.ReadAllText("data/lore.txt", Encoding.UTF8); // Read in the lore
-            Console.WriteLine("Press the <right arrow> to speed up the lore or tap <enter> to skip.");
+            Console.WriteLine("Press the <RIGHT ARROW> to speed up the lore");
 
             PrettyPrint(lore, 50); // Print out the lore
 
@@ -1634,21 +1635,15 @@ namespace Trurene_RPG
                 {
                     Thread.Sleep(delay / 5); // Short delay
                 }
-                else if (Keyboard.IsKeyDown(StringToKey("Enter"))) // If ENTER is being pressed
-                {
-                    // No delay. Basically skips text (but not completely)
-                }
                 else
                 {
-                    if (c == '\n')
-                    {
-                        Thread.Sleep(1000); // Dramatic pause
-                    }
-                    else
-                    {
-                        Thread.Sleep(delay); // Long delay
-                    }
+                    Thread.Sleep(delay); // Long delay
                 }
+                if (c == '\n')
+                {
+                    Thread.Sleep(1000); // Dramatic pause
+                }
+
             }
             Console.WriteLine();
         }

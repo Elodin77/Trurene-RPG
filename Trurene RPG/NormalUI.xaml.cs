@@ -154,37 +154,27 @@ namespace Trurene_RPG
              * It is like a super quick start guide for users who just want to learn what each button is.
              */
 
-            SolidColorBrush color = Brushes.Yellow; // The color which the area is highlighted with
 
             // How you win
             CustomMessageBox.ShowText("The way that you win is by killing the TROLL KING before he destroys every VILLAGE without dying.", "TUTORIAL", NORMAL_BACK, NORMAL_FORE);
+            CustomMessageBox.ShowText("You receive GOLD from killing ENEMIES and doing QUESTS.","TUTORIAL",NORMAL_BACK,NORMAL_FORE);
             CustomMessageBox.ShowText("You can get stronger by spending GOLD on weapons from MERCHANTS in VILLAGES.", "TUTORIAL", NORMAL_BACK, NORMAL_FORE);
             CustomMessageBox.ShowText("You can also get significantly stronger by going to the SHRINES, acquiring the ARTEFACTS, and bringing them to MAEJA to learn how to use them.", "TUTORIAL", NORMAL_BACK, NORMAL_FORE);
 
 
             // Map
-            MapTextBlock.Background = color;
             CustomMessageBox.ShowText("The VILLAGE marked with METAL (grey) weapons is the location of HAWK.", "TUTORIAL", NORMAL_BACK, NORMAL_FORE);
             CustomMessageBox.ShowText("And the VILLAGE marked with MAGIC (blue) weapons is the location of MAEJA.", "TUTORIAL", NORMAL_BACK, NORMAL_FORE);
-            Thread.Sleep(1000);
-            MapTextBlock.Background = Brushes.Transparent;
 
             // Aurora
-
-            AuroraPowerTextBlock.Background = color;
             CustomMessageBox.ShowText("The POWER is how much damage you do each hit.", "TUTORIAL", NORMAL_BACK, NORMAL_FORE);
-            Thread.Sleep(1000);
-            AuroraPowerTextBlock.Background = Brushes.Transparent;
-
-            AuroraPreparednessTextBlock.Background = color;
-            AuroraTimeTextBlock.Background = color;
             CustomMessageBox.ShowText("You can only strike when your PREPAREDNESS reaches the TIME value (shown by the bar).", "TUTORIAL", NORMAL_BACK, NORMAL_FORE);
-            Thread.Sleep(1000);
-            AuroraPreparednessTextBlock.Background = Brushes.Transparent;
-            AuroraTimeTextBlock.Background = Brushes.Transparent;
+            
+            // Shortcuts
+            CustomMessageBox.ShowText("Shortcuts:\n[W] = NORTH/WAIT\n[A]=WEST\n[S]=SOUTH/STRIKE\n[D]=EAST\n[R]=RETREAT", "TUTORIAL", NORMAL_BACK, NORMAL_FORE);
 
             // End
-            CustomMessageBox.ShowText("Congratulations, this is the end of the tutorial. Good luck on saving Trurene...", "TUTORIAL", GOLD_BACK, GOLD_FORE);
+            CustomMessageBox.ShowText("Congratulations, this is the end of the tutorial. Now go save Trurene!!!", "TUTORIAL", GOLD_BACK, GOLD_FORE);
 
 
         }
