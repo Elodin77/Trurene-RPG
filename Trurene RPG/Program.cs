@@ -58,6 +58,25 @@ namespace Trurene_RPG
             // Create default values
             GenerateDefaultValues();
 
+            // Show title 
+            string text = "|Trurene - The RPG|";
+            Console.Write(new string(' ', (Console.WindowWidth - text.Length) / 2)); // this is used to centre the text
+            Console.WriteLine(new String('-', text.Length));
+            Console.Write(new string(' ', (Console.WindowWidth - text.Length) / 2));
+            Console.WriteLine(text);
+            Console.Write(new string(' ', (Console.WindowWidth - text.Length) / 2));
+            Console.WriteLine(new String('-', text.Length));
+            Console.WriteLine("\n");
+            text = "Created by Djimon Jayasundera";
+            Console.Write(new string(' ', (Console.WindowWidth - text.Length) / 2));
+            Console.WriteLine(text);
+            text = "Computer Science ATAR 2019";
+            Console.Write(new string(' ', (Console.WindowWidth - text.Length) / 2));
+            Console.WriteLine(text);
+            Thread.Sleep(2000);
+            Console.ReadKey();
+            Console.Clear();
+
             // Show the lore
             string lore = File.ReadAllText("data/lore.txt", Encoding.UTF8); // Read in the lore
             Console.WriteLine("Press the <RIGHT ARROW> to speed up the lore");
