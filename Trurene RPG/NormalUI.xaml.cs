@@ -178,7 +178,7 @@ namespace Trurene_RPG
 
             AuroraPreparednessTextBlock.Background = color;
             AuroraTimeTextBlock.Background = color;
-            CustomMessageBox.ShowText("You can only strike when you are prepared enough.", "TUTORIAL", NORMAL_BACK, NORMAL_FORE);
+            CustomMessageBox.ShowText("You can only strike when your PREPAREDNESS reaches the TIME value (shown by the bar).", "TUTORIAL", NORMAL_BACK, NORMAL_FORE);
             Thread.Sleep(1000);
             AuroraPreparednessTextBlock.Background = Brushes.Transparent;
             AuroraTimeTextBlock.Background = Brushes.Transparent;
