@@ -202,7 +202,7 @@ namespace Trurene_RPG
             }
             else
             {
-                Console.WriteLine("Keep trying. Keep an eye on how many villages have been destroyed");
+                Console.WriteLine("Keep trying. Keep an eye on how many villages have been destroyed.");
             }
             Console.WriteLine("Thank you for playing!");
             Thread.Sleep(3000);

@@ -255,6 +255,11 @@ namespace Trurene_RPG
                         EastButton.Background = Brushes.Transparent;
                         WestButton.Background = Brushes.Transparent;
 
+                        AuroraPreparednessProgressBar.Maximum = Program.world.aurora.attack[2];
+                        AuroraPreparednessProgressBar.Value = Program.auroraPreparedness;
+                        EnemyPreparednessProgressBar.Maximum = Program.enemy.attack[2];
+                        EnemyPreparednessProgressBar.Value = Program.enemyPreparedness;
+
                         if (Program.auroraPreparedness < Program.world.aurora.attack[2])
                         {
                             StrikeButton.Content = "PREPARE";
@@ -298,6 +303,11 @@ namespace Trurene_RPG
                         SouthButton.Background = Brushes.LightGoldenrodYellow;
                         EastButton.Background = Brushes.LightGoldenrodYellow;
                         WestButton.Background = Brushes.LightGoldenrodYellow;
+
+                        AuroraPreparednessProgressBar.Maximum = 1;
+                        AuroraPreparednessProgressBar.Value = 0;
+                        EnemyPreparednessProgressBar.Maximum = 1;
+                        EnemyPreparednessProgressBar.Value = 0;
                     }
 
 

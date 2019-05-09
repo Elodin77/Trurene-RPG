@@ -41,7 +41,7 @@
             <TextBlock Text="[Power]" x:Name="AuroraPowerTextBlock"/>
             <TextBlock Text="[Time]" x:Name="AuroraTimeTextBlock"/>
             <TextBlock Text="[Preparedness]" x:Name="AuroraPreparednessTextBlock"/>
-            <TextBlock>&#x0a;</TextBlock>
+            <ProgressBar x:Name="AuroraPreparednessProgressBar" Minimum="0" Height="10"/>
             <!-- This is the enemy's statistics.-->
             <TextBlock Text="Enemy" FontWeight="Bold" x:Name="EnemyTextBlock"/>
             <TextBlock Text="[Max Health]" x:Name="EnemyMaxHealthTextBlock"/>
@@ -50,6 +50,7 @@
             <TextBlock Text="[Power]" x:Name="EnemyPowerTextBlock"/>
             <TextBlock Text="[Time]" x:Name="EnemyTimeTextBlock"/>
             <TextBlock Text="[Preparedness]" x:Name="EnemyPreparednessTextBlock"/>
+            <ProgressBar x:Name="EnemyPreparednessProgressBar" Minimum="0" Height="10"/>
         </StackPanel>
 
         <!-- This is not a stackpanel so that each button can be placed in a specific place. This section contains all of the controls.-->
