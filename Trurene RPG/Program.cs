@@ -1643,7 +1643,7 @@ namespace Trurene_RPG
         [System.Runtime.InteropServices.DllImport("gdi32.dll")]
         public static extern bool DeleteObject(IntPtr hObject); // add this function to dispose variables to prevent memory leaks
 
-        // FANCY STUFF //
+        // FANCY FUNCTIONS //
         public static void PrettyPrint(string text, int delay)
         {
 
@@ -1749,13 +1749,13 @@ namespace Trurene_RPG
 
         // GLOBAL VARIABLES //
         // Overall vars
-        public static string[] commands = {"/quit", "/hawk", "/maeja", "/save", "/load"}; // A list of commands...
+        
         public static World world;
         public static Random random = new Random(); // Create a random object which is used for all random stuff
         public static System.Windows.Application NormalUI = new System.Windows.Application(); // Create a new application (WPF)
         public static SoundPlayer backgroundMusic = new SoundPlayer(@"data/audio/background1.wav");
         public static string backgroundMusicTrack = "normal";
-        public static bool firstUIUpdate = false;
+        public static bool firstUIUpdate = false; 
 
         // Game vars
         public static bool gameOver = false; // This is checked each turn to make sure that the game is not over
@@ -1774,7 +1774,7 @@ namespace Trurene_RPG
         public static List<FormattedText> notificationsQueue = new List<FormattedText>(); // This is the text which still needs to be added to the notifications
 
         
-        // Data Structures
+        // DATA STRUCTURES //
         public struct World
         {
             // General world values
