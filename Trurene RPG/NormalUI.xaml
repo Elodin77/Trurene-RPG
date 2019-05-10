@@ -11,7 +11,7 @@
   WindowStyle="SingleBorderWindow" ResizeMode="CanResizeWithGrip"  
   WindowStartupLocation="CenterScreen" WindowState="Maximized" KeyDown="KeyDownHandler" Closing="OnShutdown">
 
-    <Grid TextBlock.FontSize="15" TextBlock.FontFamily="Comic Sans MS">
+    <Grid TextBlock.FontSize="13" TextBlock.FontFamily="Comic Sans MS">
         <!-- First the grid is defined.-->
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="2*"/>
@@ -29,7 +29,7 @@
         <Image x:Name="Map"/>
 
         <!-- This section shows Aurora's fighting related statistics and the enemies statistics.-->
-        <StackPanel Grid.Column="1">
+        <StackPanel Grid.Column="1" RenderTransformOrigin="0.441,0.225">
             <TextBlock>&#x0a;</TextBlock>
             <TextBlock>&#x0a;</TextBlock>
             <TextBlock Text="[Tick]" x:Name="TickTextBlock"/>
@@ -37,6 +37,7 @@
             <TextBlock Text="Aurora" FontWeight="Bold" x:Name="AuroraTextBlock"/>
             <TextBlock Text="[Max Health]" x:Name="AuroraMaxHealthTextBlock"/>
             <TextBlock Text="[Health]" x:Name="AuroraHealthTextBlock"/>
+            <ProgressBar x:Name="AuroraHealthProgressBar" Minimum="0" Height="10"/>
             <TextBlock Text="[Accuracy]" x:Name="AuroraAccuracyTextBlock"/>
             <TextBlock Text="[Power]" x:Name="AuroraPowerTextBlock"/>
             <TextBlock Text="[Time]" x:Name="AuroraTimeTextBlock"/>
@@ -46,6 +47,7 @@
             <TextBlock Text="Enemy" FontWeight="Bold" x:Name="EnemyTextBlock"/>
             <TextBlock Text="[Max Health]" x:Name="EnemyMaxHealthTextBlock"/>
             <TextBlock Text="[Health]" x:Name="EnemyHealthTextBlock"/>
+            <ProgressBar x:Name="EnemyHealthProgressBar" Minimum="0" Height="10"/>
             <TextBlock Text="[Accuracy]" x:Name="EnemyAccuracyTextBlock"/>
             <TextBlock Text="[Power]" x:Name="EnemyPowerTextBlock"/>
             <TextBlock Text="[Time]" x:Name="EnemyTimeTextBlock"/>

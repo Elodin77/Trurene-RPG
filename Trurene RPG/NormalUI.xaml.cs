@@ -206,6 +206,15 @@ namespace Trurene_RPG
 
                     // Update Aurora related variables
                     AuroraAccuracyTextBlock.Text = "Accuracy:\t" + Convert.ToString(Program.world.aurora.attack[0]);
+                    if (Program.world.aurora.health > Program.world.aurora.maxHealth)
+                    {
+                        AuroraHealthProgressBar.Maximum = Program.world.aurora.health;
+                    }
+                    else
+                    {
+                        AuroraHealthProgressBar.Maximum = Program.world.aurora.maxHealth;
+                    }
+                    AuroraHealthProgressBar.Value = Program.world.aurora.health;
                     AuroraHealthTextBlock.Text = "Health:\t" + Convert.ToString(Program.world.aurora.health);
                     AuroraMaxHealthTextBlock.Text = "Max Health:\t" + Convert.ToString(Program.world.aurora.maxHealth);
                     AuroraPowerTextBlock.Text = "Power:\t" + Convert.ToString(Program.world.aurora.attack[1]);
@@ -245,6 +254,7 @@ namespace Trurene_RPG
                         EastButton.Background = Brushes.Transparent;
                         WestButton.Background = Brushes.Transparent;
 
+                        // Update progress bars
                         AuroraPreparednessProgressBar.Maximum = Program.world.aurora.attack[2];
                         AuroraPreparednessProgressBar.Value = Program.auroraPreparedness;
                         EnemyPreparednessProgressBar.Maximum = Program.enemy.attack[2];
@@ -260,6 +270,16 @@ namespace Trurene_RPG
                             StrikeButton.Content = "STRIKE";
                             StrikeButton.Background = Brushes.LightGreen;
                         }
+
+                        if (Program.enemy.health > Program.enemy.maxHealth)
+                        {
+                            EnemyHealthProgressBar.Maximum = Program.enemy.health;
+                        }
+                        else
+                        {
+                            EnemyHealthProgressBar.Maximum = Program.enemy.maxHealth;
+                        }
+                        EnemyHealthProgressBar.Value = Program.enemy.health;
                     }
                     else
                     {
@@ -298,6 +318,8 @@ namespace Trurene_RPG
                         AuroraPreparednessProgressBar.Value = 0;
                         EnemyPreparednessProgressBar.Maximum = 1;
                         EnemyPreparednessProgressBar.Value = 0;
+                        EnemyHealthProgressBar.Maximum = 1;
+                        EnemyHealthProgressBar.Value = 0;
                     }
 
 
