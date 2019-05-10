@@ -35,6 +35,8 @@ namespace Trurene_RPG
         // FUNCTIONS
         public NormalUI()
         {
+
+
             // Start the timer to continually update the UI
             UpdateEverythingTimer = new System.Timers.Timer();
             UpdateEverythingTimer.Elapsed += new ElapsedEventHandler(UpdateEverything);
@@ -63,7 +65,7 @@ namespace Trurene_RPG
         // Miscellaneous buttons
         public void LoadButtonClick(object sender, RoutedEventArgs e)
         {
-            
+            LoadButton.Background = Brushes.Gray;
             try
             {
                 Program.Load(CustomMessageBox.ShowTextEntry("Filename", "LOAD"));
@@ -73,9 +75,11 @@ namespace Trurene_RPG
                 CustomMessageBox.ShowText("Filename or file format is invalid!", "LOAD ERROR", WARNING_BACK, WARNING_FORE);
                 // Will happen if file format is wrong or file doesn't exist with that filename.
             }
+            LoadButton.Background = Brushes.LightGray;
         }
         public void SaveButtonClick(object sender, RoutedEventArgs e)
         {
+            SaveButton.Background = Brushes.Gray;
             try
             {
                 Program.Save(CustomMessageBox.ShowTextEntry("SAVE", "Filename"));
@@ -84,8 +88,8 @@ namespace Trurene_RPG
             catch
             {
                 Program.AddNotification("The save filename is invalid!\n", new DependencyProperty[] { TextElement.ForegroundProperty }, new object[] { Brushes.PaleVioletRed });
-                
             }
+            SaveButton.Background = Brushes.LightGray;
         }
 
         // Movement buttons
@@ -150,6 +154,7 @@ namespace Trurene_RPG
 
         public void TutorialButtonClick(object sender, RoutedEventArgs e)
         {
+            TutorialButton.Background = Brushes.Gray;
             /* This function goes through each piece of text on the UI, highlights it, and tells the user what it is.
              * It is like a super quick start guide for users who just want to learn what each button is.
              */
@@ -176,9 +181,9 @@ namespace Trurene_RPG
             // End
             CustomMessageBox.ShowText("Congratulations, this is the end of the tutorial. Now go save Trurene!!!", "TUTORIAL", GOLD_BACK, GOLD_FORE);
 
-
+            TutorialButton.Background = Brushes.LightGray;
         }
-
+        
         // Functions on timers (repeated after certain interval)
         public void UpdateEverything(object source, ElapsedEventArgs e)
         {
@@ -189,6 +194,15 @@ namespace Trurene_RPG
             {
                 Dispatcher.Invoke(() =>
                 {
+                    if (!Program.firstUIUpdate) // This is all the code that basically runs "on startup" of the UI
+                    {
+                        // Change button colours to be uniform
+                        SaveButton.Background = Brushes.LightGray;
+                        LoadButton.Background = Brushes.LightGray;
+                        TutorialButton.Background = Brushes.LightGray;
+
+                        Program.firstUIUpdate = true;
+                    }
                     // Update the map (height and width in the case of a load)
                     Map.Height = MAP_HEIGHT;
                     Map.Width = MAP_WIDTH;
@@ -215,8 +229,7 @@ namespace Trurene_RPG
                         AuroraHealthProgressBar.Maximum = Program.world.aurora.maxHealth;
                     }
                     AuroraHealthProgressBar.Value = Program.world.aurora.health;
-                    AuroraHealthTextBlock.Text = "Health:\t" + Convert.ToString(Program.world.aurora.health);
-                    AuroraMaxHealthTextBlock.Text = "Max Health:\t" + Convert.ToString(Program.world.aurora.maxHealth);
+                    AuroraHealthProgressBarText.Text = Convert.ToString(Program.world.aurora.health) + "/" + Convert.ToString(Program.world.aurora.maxHealth);
                     AuroraPowerTextBlock.Text = "Power:\t" + Convert.ToString(Program.world.aurora.attack[1]);
                     AuroraPreparednessTextBlock.Text = "Preparedness:\t" + Convert.ToString(Program.auroraPreparedness);
                     AuroraTimeTextBlock.Text = "Time:\t" + Convert.ToString(Program.world.aurora.attack[2]);
@@ -225,23 +238,18 @@ namespace Trurene_RPG
                     if (Program.fighting)
                     {
                         EnemyAccuracyTextBlock.Text = "Accuracy:\t" + Convert.ToString(Program.enemy.attack[0]);
-                        EnemyHealthTextBlock.Text = "Health:\t" + Convert.ToString(Program.enemy.health);
-                        EnemyMaxHealthTextBlock.Text = "Max Health:\t" + Convert.ToString(Program.enemy.maxHealth);
+                        
                         EnemyPowerTextBlock.Text = "Power:\t" + Convert.ToString(Program.enemy.attack[1]);
                         EnemyPreparednessTextBlock.Text = "Preparedness:\t" + Convert.ToString(Program.enemyPreparedness);
                         EnemyTimeTextBlock.Text = "Time:\t" + Convert.ToString(Program.enemy.attack[2]);
 
                         EnemyAccuracyTextBlock.Background = Brushes.OrangeRed;
-                        EnemyHealthTextBlock.Background = Brushes.OrangeRed;
-                        EnemyMaxHealthTextBlock.Background = Brushes.OrangeRed;
                         EnemyPowerTextBlock.Background = Brushes.OrangeRed;
                         EnemyPreparednessTextBlock.Background = Brushes.OrangeRed;
                         EnemyTimeTextBlock.Background = Brushes.OrangeRed;
                         EnemyTextBlock.Background = Brushes.OrangeRed;
 
                         AuroraAccuracyTextBlock.Background = Brushes.LightGreen;
-                        AuroraHealthTextBlock.Background = Brushes.LightGreen;
-                        AuroraMaxHealthTextBlock.Background = Brushes.LightGreen;
                         AuroraPowerTextBlock.Background = Brushes.LightGreen;
                         AuroraPreparednessTextBlock.Background = Brushes.LightGreen;
                         AuroraTimeTextBlock.Background = Brushes.LightGreen;
@@ -249,12 +257,13 @@ namespace Trurene_RPG
 
                         WaitButton.Background = Brushes.LightGoldenrodYellow;
                         RetreatButton.Background = Brushes.LightGoldenrodYellow;
-                        NorthButton.Background = Brushes.Transparent;
-                        SouthButton.Background = Brushes.Transparent;
-                        EastButton.Background = Brushes.Transparent;
-                        WestButton.Background = Brushes.Transparent;
+                        NorthButton.Background = Brushes.LightGray;
+                        SouthButton.Background = Brushes.LightGray;
+                        EastButton.Background = Brushes.LightGray;
+                        WestButton.Background = Brushes.LightGray;
 
                         // Update progress bars
+                        EnemyHealthProgressBarText.Text = Convert.ToString(Program.enemy.health) + "/" + Convert.ToString(Program.enemy.maxHealth);
                         AuroraPreparednessProgressBar.Maximum = Program.world.aurora.attack[2];
                         AuroraPreparednessProgressBar.Value = Program.auroraPreparedness;
                         EnemyPreparednessProgressBar.Maximum = Program.enemy.attack[2];
@@ -284,23 +293,18 @@ namespace Trurene_RPG
                     else
                     {
                         EnemyAccuracyTextBlock.Text = "[Accuracy]";
-                        EnemyHealthTextBlock.Text = "[Health]";
-                        EnemyMaxHealthTextBlock.Text = "[Max Health]";
+                        EnemyHealthProgressBarText.Text = "[Health]/[Max Health]";
                         EnemyPowerTextBlock.Text = "[Power]";
                         EnemyPreparednessTextBlock.Text = "[Preparedness]";
                         EnemyTimeTextBlock.Text = "[Time]";
 
                         EnemyAccuracyTextBlock.Background = Brushes.Transparent;
-                        EnemyHealthTextBlock.Background = Brushes.Transparent;
-                        EnemyMaxHealthTextBlock.Background = Brushes.Transparent;
                         EnemyPowerTextBlock.Background = Brushes.Transparent;
                         EnemyPreparednessTextBlock.Background = Brushes.Transparent;
                         EnemyTimeTextBlock.Background = Brushes.Transparent;
                         EnemyTextBlock.Background = Brushes.Transparent;
 
                         AuroraAccuracyTextBlock.Background = Brushes.Transparent;
-                        AuroraHealthTextBlock.Background = Brushes.Transparent;
-                        AuroraMaxHealthTextBlock.Background = Brushes.Transparent;
                         AuroraPowerTextBlock.Background = Brushes.Transparent;
                         AuroraPreparednessTextBlock.Background = Brushes.Transparent;
                         AuroraTimeTextBlock.Background = Brushes.Transparent;
@@ -331,6 +335,7 @@ namespace Trurene_RPG
             {
                 // couldn't update UI
             }
+
 
 
         }

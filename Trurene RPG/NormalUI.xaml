@@ -35,25 +35,29 @@
             <TextBlock Text="[Tick]" x:Name="TickTextBlock"/>
             <!-- This is Aurora's statistics.-->
             <TextBlock Text="Aurora" FontWeight="Bold" x:Name="AuroraTextBlock"/>
-            <TextBlock Text="[Max Health]" x:Name="AuroraMaxHealthTextBlock"/>
-            <TextBlock Text="[Health]" x:Name="AuroraHealthTextBlock"/>
-            <ProgressBar x:Name="AuroraHealthProgressBar" Minimum="0" Height="10"/>
+            <Grid>
+                <ProgressBar x:Name="AuroraHealthProgressBar" Minimum="0" Height="15"/>
+                <TextBlock x:Name="AuroraHealthProgressBarText" Text="[Health]/[Max Health]" FontSize="10" Margin="1,1,1,1" TextAlignment="Center" RenderTransformOrigin="0.599,1" Height="15"/>
+            </Grid>
             <TextBlock Text="[Accuracy]" x:Name="AuroraAccuracyTextBlock"/>
             <TextBlock Text="[Power]" x:Name="AuroraPowerTextBlock"/>
             <TextBlock Text="[Time]" x:Name="AuroraTimeTextBlock"/>
             <TextBlock Text="[Preparedness]" x:Name="AuroraPreparednessTextBlock"/>
-            <ProgressBar x:Name="AuroraPreparednessProgressBar" Minimum="0" Height="10"/>
+            <ProgressBar x:Name="AuroraPreparednessProgressBar" Minimum="0" Height="15"/>
             <!-- This is the enemy's statistics.-->
             <TextBlock Text="Enemy" FontWeight="Bold" x:Name="EnemyTextBlock"/>
-            <TextBlock Text="[Max Health]" x:Name="EnemyMaxHealthTextBlock"/>
-            <TextBlock Text="[Health]" x:Name="EnemyHealthTextBlock"/>
-            <ProgressBar x:Name="EnemyHealthProgressBar" Minimum="0" Height="10"/>
+            <Grid>
+                <ProgressBar x:Name="EnemyHealthProgressBar" Minimum="0" Height="15"/>
+                <TextBlock x:Name="EnemyHealthProgressBarText" Text="[Health]/[Max Health]" FontSize="10" Height="15" Margin="1,1,1,1" TextAlignment="Center" RenderTransformOrigin="0.599,1"/>
+            </Grid>
             <TextBlock Text="[Accuracy]" x:Name="EnemyAccuracyTextBlock"/>
             <TextBlock Text="[Power]" x:Name="EnemyPowerTextBlock"/>
             <TextBlock Text="[Time]" x:Name="EnemyTimeTextBlock"/>
             <TextBlock Text="[Preparedness]" x:Name="EnemyPreparednessTextBlock"/>
             <ProgressBar x:Name="EnemyPreparednessProgressBar" Minimum="0" Height="10"/>
         </StackPanel>
+        
+        
 
         <!-- This is not a stackpanel so that each button can be placed in a specific place. This section contains all of the controls.-->
         <TextBlock Grid.Row="1" x:Name="ControlsTextBlock" Text="Controls" FontSize="15" FontWeight="Bold"/>

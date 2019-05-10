@@ -54,7 +54,6 @@ namespace Trurene_RPG
              * nature of the User Interface. The UI actually coordinates and runs the game.
              */
 
-
             // Create default values
             GenerateDefaultValues();
 
@@ -154,8 +153,12 @@ namespace Trurene_RPG
             {
                 folders[i] = Regex.Replace(folders[i],@"data/resource packs\\", ""); // just get the name of the resource pack
             }
+
+            Console.WriteLine("The Developer's Resource Packs were the UNREFINED icons created and used by the developer in the development of the project.");
+            Console.WriteLine("The External Resource Packs were not created by the developer and are far more REFINED versions of the original icons.");
+            Console.WriteLine();
             // show the developer's resource packs
-            Console.WriteLine("Developer's Resource Packs");
+            Console.WriteLine("Developer's Resource Packs: ");
             foreach (string str in DEVELOPER_RESOURCE_PACKS)
             {
                 Console.WriteLine("\t- " + str);
@@ -228,6 +231,8 @@ namespace Trurene_RPG
             Thread.Sleep(3000);
 
             Console.WriteLine("\n\n\nPRESS ANY KEY TO CONTINUE");
+            Thread.Sleep(1000);
+            FlushKeyboard();
             Console.ReadKey();
         }
 
@@ -840,7 +845,7 @@ namespace Trurene_RPG
             // Check if Hawk is at village
             if (DistanceBetween(world.hawkPosition, world.aurora.pos) == 0)
             {
-                string message = "Hey Aurora! I draw where I think that the Troll King is on your map! ";
+                string message = "HAWK: Hey Aurora! I drew where I think that the Troll King is on your map! ";
                 message += "I also draw where the wolves are, I heard that they are hunting you. You should be careful.\n";
                 AddNotification(message, new DependencyProperty[] { TextElement.ForegroundProperty }, new object[] { Brushes.Green });
                 hawkOmniscience = true;
@@ -1688,9 +1693,9 @@ namespace Trurene_RPG
         {
             /* This function removes the input buffer which is important in some cases.
              */
-            while (Console.In.Peek() != -1)
+            while (Console.KeyAvailable == true)
             {
-                Console.In.Read();
+                Console.ReadKey();
             }
         }
         public static void UpdateBackgroundMusic()
@@ -1750,6 +1755,7 @@ namespace Trurene_RPG
         public static System.Windows.Application NormalUI = new System.Windows.Application(); // Create a new application (WPF)
         public static SoundPlayer backgroundMusic = new SoundPlayer(@"data/audio/background1.wav");
         public static string backgroundMusicTrack = "normal";
+        public static bool firstUIUpdate = false;
 
         // Game vars
         public static bool gameOver = false; // This is checked each turn to make sure that the game is not over
