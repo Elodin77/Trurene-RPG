@@ -1,6 +1,10 @@
 # Trurene - The RPG
 
-This is a game which I, Djimon Jayasundera, have made as part of a submission for a Computer Science project.
+This is a game which I, Djimon Jayasundera, have made as part of a submission for a Computer Science project. Expect bugs, errors and some incorrect information in the files contained in this repository. SPREADING THE WORD and FEEDBACK are both greatly appreciated and help my Computer Science project significantly.
+
+## Feedback
+
+Feedback is greatly appreciated and can be given through the form at https://forms.gle/rNMHBPLkZixPSEyX6.
 
 ## Gamestate file template
 
