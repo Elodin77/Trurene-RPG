@@ -11,7 +11,7 @@
   WindowStyle="SingleBorderWindow" ResizeMode="CanResizeWithGrip"  
   WindowStartupLocation="CenterScreen" WindowState="Maximized" KeyDown="KeyDownHandler" Closing="OnShutdown">
 
-    <Grid TextBlock.FontSize="13" TextBlock.FontFamily="Comic Sans MS">
+    <Grid TextBlock.FontSize="13" TextBlock.FontFamily="Comic Sans MS" x:Name="WindowGrid">
         <!-- First the grid is defined.-->
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="2*"/>
@@ -44,6 +44,8 @@
             <TextBlock Text="[Time]" x:Name="AuroraTimeTextBlock"/>
             <TextBlock Text="[Preparedness]" x:Name="AuroraPreparednessTextBlock"/>
             <ProgressBar x:Name="AuroraPreparednessProgressBar" Minimum="0" Height="15"/>
+            <TextBlock>&#x0a;</TextBlock>
+            <TextBlock>&#x0a;</TextBlock>
             <!-- This is the enemy's statistics.-->
             <TextBlock Text="Enemy" FontWeight="Bold" x:Name="EnemyTextBlock"/>
             <Grid>
@@ -82,11 +84,14 @@
         <StackPanel Grid.Row="0" Grid.Column="2" Grid.RowSpan="2">
             <CheckBox x:Name="checkAutoSave" IsChecked="True">Auto Save</CheckBox>
             <CheckBox x:Name="checkAutoPrepare" IsChecked="True">Auto Prepare</CheckBox>
+            <TextBlock>&#x0a;</TextBlock>
+
             <!-- This is where the main notification text appears-->
-            <RichTextBox x:Name="notificationsRTF" ScrollViewer.VerticalScrollBarVisibility="Auto" Height="533" Width="199">
+            <RichTextBox x:Name="notificationsRTF" ScrollViewer.VerticalScrollBarVisibility="Auto" Height="400">
                 <FlowDocument x:Name="notificationsFlowDoc">
                     <Paragraph>
                         <!-- There is actually only 1 paragraph for all the text-->
+                        
                     </Paragraph>
                 </FlowDocument>
             </RichTextBox>

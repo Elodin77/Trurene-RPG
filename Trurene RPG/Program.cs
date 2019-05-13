@@ -66,7 +66,7 @@ namespace Trurene_RPG
             Console.Write(new string(' ', (Console.WindowWidth - text.Length) / 2));
             Console.WriteLine(new String('-', text.Length));
             Console.WriteLine("\n");
-            text = "Created by Djimon Jayasundera";
+            text = "A game by Djimon Jayasundera";
             Console.Write(new string(' ', (Console.WindowWidth - text.Length) / 2));
             Console.WriteLine(text);
             text = "Computer Science ATAR 2019";
@@ -83,7 +83,7 @@ namespace Trurene_RPG
             PrettyPrint(lore, 50); // Print out the lore
 
             Console.WriteLine("\n\n\nPRESS ANY KEY TO CONTINUE");
-            Thread.Sleep(1000);
+            Thread.Sleep(500);
             FlushKeyboard();
             Console.ReadKey();
             Console.Clear();
@@ -140,7 +140,7 @@ namespace Trurene_RPG
             }
 
             Console.WriteLine("\n\n\nPRESS ANY KEY TO CONTINUE");
-            Thread.Sleep(1000);
+            Thread.Sleep(500);
             FlushKeyboard();
             Console.ReadKey();
 
@@ -194,7 +194,7 @@ namespace Trurene_RPG
 
 
             Console.WriteLine("\n\n\nPRESS ANY KEY TO CONTINUE");
-            Thread.Sleep(1000);
+            Thread.Sleep(500);
             FlushKeyboard();
             Console.ReadKey();
             Console.Clear();
@@ -212,29 +212,35 @@ namespace Trurene_RPG
             NormalUI.StartupUri = new Uri("NormalUI.xaml", System.UriKind.Relative); // Make the app run code on startup
             NormalUI.Run(); // Run the app
             // Finish the game
-            if (world.aurora.health <= 0)
-            {
-                PlaySound("die.wav", 1.0);
-                Console.WriteLine("Keep trying. Keep an eye on your health.");
-            }
-            else if (world.trollKing.health <= 0)
-            {
-                Console.WriteLine("Congratulations on finishing the game!!");
-                Console.Write("Your score was: ");
-                Console.WriteLine(world.turnNum);
-            }
-            else
-            {
-                Console.WriteLine("Keep trying. Keep an eye on how many villages have been destroyed.");
-            }
-            Console.WriteLine("Thank you for playing!");
-            Thread.Sleep(3000);
+            
+            Console.Clear();
+            text = "|Trurene - The RPG|";
+            Console.Write(new string(' ', (Console.WindowWidth - text.Length) / 2)); // this is used to centre the text
+            Console.WriteLine(new String('-', text.Length));
+            Console.Write(new string(' ', (Console.WindowWidth - text.Length) / 2));
+            Console.WriteLine(text);
+            Console.Write(new string(' ', (Console.WindowWidth - text.Length) / 2));
+            Console.WriteLine(new String('-', text.Length));
+            Console.WriteLine("\n");
+            text = "A game by Djimon Jayasundera";
+            Console.Write(new string(' ', (Console.WindowWidth - text.Length) / 2));
+            Console.WriteLine(text);
+            text = "Computer Science ATAR 2019";
+            Console.Write(new string(' ', (Console.WindowWidth - text.Length) / 2));
+            Console.WriteLine(text);
+            Console.WriteLine();
+            text = "THANK YOU SO MUCH FOR PLAYING";
+            Console.Write(new string(' ', (Console.WindowWidth - text.Length) / 2));
+            Console.WriteLine(text);
+            Thread.Sleep(2000);
+            Console.ReadKey();
 
-            Console.WriteLine("\n\n\nPRESS ANY KEY TO CONTINUE");
+            Console.WriteLine("\n\n\nPRESS ANY KEY TO CLOSE THE GAME");
             Thread.Sleep(1000);
             FlushKeyboard();
             Console.ReadKey();
         }
+
 
         // MOVEMENT //
         public static void MoveAurora()
@@ -322,6 +328,7 @@ namespace Trurene_RPG
             if (DistanceBetween(world.trollKing.pos, world.targetVillagePosition) == 0)
             {
                 world.destroyedVillages.Add(world.trollKing.pos);
+                // [todo] bug here
                 world.targetVillagePosition = world.villagePositions.Except(world.destroyedVillages).ToList()[random.Next(world.villagePositions.Length - world.destroyedVillages.Count() - 1)];
             }
             // Move Hawk if he is on a destroyed village
@@ -410,6 +417,47 @@ namespace Trurene_RPG
         }
 
         // USER INTERACTION //
+        public static void NextTurn()
+        {
+            /* This is the function which is run for each turn. This function is run repeatedly to start each
+             * turn in the game. The user runs this function with a button, but anti-cheat methods are implemented
+             * to stop users exploiting the fact that they control when the turn "rolls over".
+             * 
+             * The functions which it does include:
+             * updating the world.
+             * showing any important messages to the user.
+             * moving Aurora (the player).
+             * doing any interactions important for fighting or villages.
+             * stopping the game if it is over.
+             * 
+             */
+            hawkOmniscience = false;
+            UpdateBackgroundMusic();
+            bool trollKingAlive = world.trollKing.health > 0;
+            bool auroraAlive = world.aurora.health > 0;
+            if (!(auroraAlive && trollKingAlive && world.villagePositions.Length > 0))
+            {
+                gameOver = true;
+                NormalUI.Shutdown();
+            }
+            else
+            {
+                if (fighting)
+                {
+                    fighting = DoFightTurn();
+                }
+                else
+                {
+                    world.turnNum += 1;
+                    UpdateWorld();
+                    DoMessages();
+                    MoveAurora();
+                    CalcTurnEvents();
+
+                }
+            }
+
+        }
         public static void CalcTurnEvents()
         {
             /* This function is one of the most complicated functions.
@@ -572,8 +620,7 @@ namespace Trurene_RPG
             /* This function runs the interaction for the fighting. 
              * The enemy is a global variable so that the WPF application can access it.
              */
-            
-
+            numFightTurns += 1; // High score is bad
             bool enemyStrike = false;
             bool auroraStrike = false;
             bool retreated = false;
@@ -646,42 +693,43 @@ namespace Trurene_RPG
             // Check if there was a simultaneous strike
             if (auroraStrike && enemyStrike && simultaneousStrikes < NUM_TIMES_TO_SHATTER && !retreated)
             {
-
-
+                weaponDamaged = true;
+                PlaySound("parry.wav", 1.0);
+                CustomMessageBox.ShowText("Nobody took damage!","FIGHTING",WARNING_BACK,WARNING_FORE);
                 if (world.aurora.attack[1] > enemy.attack[1] && simultaneousStrikes != NUM_TIMES_TO_SHATTER)
                 {
-                    PlaySound("parry.wav", 0.5);
+                    CustomMessageBox.ShowText("You strike simultaneously and DAMAGE the enemy's weapon!", "FIGHTING", SUCCESS_BACK, SUCCESS_FORE);
                     AddNotification("You strike simultaneously and DAMAGE the enemy's weapon!\n", new DependencyProperty[] { TextElement.ForegroundProperty }, new object[] { Brushes.Green });
                     enemy.attack[1] = (int)Math.Floor(enemy.attack[1] * SIMULTANEOUS_STRIKE_DAMAGE);
 
                 }
                 else if (world.aurora.attack[1] > enemy.attack[1] && simultaneousStrikes == NUM_TIMES_TO_SHATTER)
                 {
-                    PlaySound("parry.wav", 1.0);
+                    CustomMessageBox.ShowText("You strike simultaneously and SHATTER the enemy's weapon!", "FIGHTING", SUCCESS_BACK, SUCCESS_FORE);
                     AddNotification("You strike simultaneously and SHATTER the enemy's weapon!\n", new DependencyProperty[] { TextElement.ForegroundProperty }, new object[] { Brushes.DarkGreen });
                     enemy.attack[1] = (int)Math.Floor(enemy.attack[1] * SHATTER_DAMAGE);
 
                 }
                 else if (world.aurora.attack[1] < enemy.attack[1] && simultaneousStrikes != NUM_TIMES_TO_SHATTER)
                 {
-                    PlaySound("parry.wav", 0.5);
+                    CustomMessageBox.ShowText("You strike simultaneously and DAMAGE your weapon!", "FIGHTING", WARNING_BACK, WARNING_FORE);
                     AddNotification("You strike simultaneously and DAMAGE your weapon!\n", new DependencyProperty[] { TextElement.ForegroundProperty }, new object[] { Brushes.Red });
                     world.aurora.attack[1] = (int)Math.Floor(world.aurora.attack[1] * SIMULTANEOUS_STRIKE_DAMAGE);
 
                 }
                 else if (world.aurora.attack[1] < enemy.attack[1] && simultaneousStrikes == NUM_TIMES_TO_SHATTER)
                 {
-                    PlaySound("parry.wav", 1.0);
+                    CustomMessageBox.ShowText("You strike simultaneously and SHATTER your weapon!", "FIGHTING", WARNING_BACK, WARNING_FORE);
                     AddNotification("You strike simultaneously and SHATTER your weapon!\n", new DependencyProperty[] { TextElement.ForegroundProperty }, new object[] { Brushes.DarkRed });
                     world.aurora.attack[1] = (int)Math.Floor(world.aurora.attack[1] * SHATTER_DAMAGE);
-
                 }
                 else
                 {
+                    CustomMessageBox.ShowText("You strike simultaneously and nobody takes damage", "FIGHTING", WARNING_BACK, WARNING_FORE);
                     AddNotification("You strike simultaneously and nobody takes damage!\n", new DependencyProperty[] { TextElement.ForegroundProperty }, new object[] { Brushes.Purple});
-                    PlaySound("parry.wav", 0.5);
-
                 }
+
+                simultaneousStrikes += 1;
             }
             else if (auroraStrike && !retreated)
             {
@@ -1169,15 +1217,14 @@ namespace Trurene_RPG
             world.hawkPosition = world.villagePositions[random.Next(world.numVillages)];
             // Create destroyed villages
             world.destroyedVillages = new List<Position>();
-            tempPosition.row = -1;
-            tempPosition.col = -1;
-            world.destroyedVillages.Add(tempPosition);
             // Set Misc. values
             world.spells = new int[] { 0, 0, 0, 0 };
             world.turnNum = 0;
             world.questPosition = new Position();
             world.questPosition.row = -1;
             world.questPosition.col = -1;
+            // Generate the first target for the Troll King
+            world.targetVillagePosition = world.villagePositions[random.Next(world.villagePositions.Length - 1)];
             ICON_WIDTH = (int)Math.Floor(MAP_WIDTH / Convert.ToDouble(world.cols));
             ICON_HEIGHT = (int)Math.Floor(MAP_HEIGHT / Convert.ToDouble(world.rows));
             ICON_WIDTH = Math.Min(ICON_HEIGHT, ICON_WIDTH);
@@ -1439,12 +1486,16 @@ namespace Trurene_RPG
                 lines[18] += Convert.ToString(world.villagePositions[i].row) + " " + Convert.ToString(world.villagePositions[i].col) + ",";
             }
             lines[18] += Convert.ToString(world.villagePositions[world.villagePositions.Count() - 1].row) + " " + Convert.ToString(world.villagePositions[world.villagePositions.Count() - 1].col);
-            for (int i = 0; i < world.destroyedVillages.Count() - 1; i++)
+            try
             {
-                lines[19] += Convert.ToString(world.destroyedVillages[i].row) + " " + Convert.ToString(world.destroyedVillages[i].col) + ",";
+                for (int i = 0; i < world.destroyedVillages.Count() - 1; i++)
+                {
+                    lines[19] += Convert.ToString(world.destroyedVillages[i].row) + " " + Convert.ToString(world.destroyedVillages[i].col) + ",";
+                }
+                lines[19] += Convert.ToString(world.destroyedVillages[world.destroyedVillages.Count() - 1].row) + " " + Convert.ToString(world.destroyedVillages[world.destroyedVillages.Count() - 1].col);
             }
-            lines[19] += Convert.ToString(world.destroyedVillages[world.destroyedVillages.Count() - 1].row) + " " + Convert.ToString(world.destroyedVillages[world.destroyedVillages.Count() - 1].col);
-            for (int i = 0; i < world.shrines.Count() - 1; i++)
+            catch { lines[19] = ""; }
+                for (int i = 0; i < world.shrines.Count() - 1; i++)
             {
                 lines[20] += Convert.ToString(world.shrines[i].pos.row) + " " + Convert.ToString(world.shrines[i].pos.col) + ",";
             }
@@ -1530,10 +1581,11 @@ namespace Trurene_RPG
                 }
             }
             // Get destroyed village positions
-            tempArray = Array.ConvertAll(gameState.Split('\n')[19].Split(','), s => s);
-
             world.destroyedVillages = new List<Position>(); // Initialise world.destroyedVillages
-            Position tempPos = new Position();
+                tempArray = Array.ConvertAll(gameState.Split('\n')[19].Split(','), s => s);
+
+
+                Position tempPos = new Position();
             for (int i = 0; i < tempArray.Length; i++)
             {
                 // This block of code was the one which needed the line below (mentioned near here),
@@ -1547,7 +1599,7 @@ namespace Trurene_RPG
                 }
             }
             // Generate the first target for the Troll King
-            world.targetVillagePosition = world.villagePositions[random.Next() % world.villagePositions.Length];
+            world.targetVillagePosition = world.villagePositions[random.Next(world.villagePositions.Length-1)];
 
             // Get shrine positions
             tempArray = Array.ConvertAll(gameState.Split('\n')[20].Split(','), s => s);
@@ -1599,49 +1651,50 @@ namespace Trurene_RPG
 
 
         }
-        public static void NextTurn()
+        public static int CalculateScore()
         {
-            /* This is the function which is run for each turn. This function is run repeatedly to start each
-             * turn in the game. The user runs this function with a button, but anti-cheat methods are implemented
-             * to stop users exploiting the fact that they control when the turn "rolls over".
-             * 
-             * The functions which it does include:
-             * updating the world.
-             * showing any important messages to the user.
-             * moving Aurora (the player).
-             * doing any interactions important for fighting or villages.
-             * stopping the game if it is over.
-             * 
+            /* This function calculates the score based on a number of variables.
+             * It also writes this breakdown to the console.
              */
-            hawkOmniscience = false;
-            UpdateBackgroundMusic();
-            bool trollKingAlive = world.trollKing.health > 0;
-            bool auroraAlive = world.aurora.health > 0;
-            if (!(auroraAlive && trollKingAlive && world.villagePositions.Length > 0))
-            {
-                gameOver = true;
-                NormalUI.Shutdown();
-            }
-            else
-            {
-                if (fighting)
-                {
-                    fighting = DoFightTurn();
-                }
-                else
-                {
-                    world.turnNum += 1;
-                    UpdateWorld();
-                    DoMessages();
-                    MoveAurora();
-                    CalcTurnEvents();
+            Console.Clear();
+            Console.WriteLine("SCORE BREAKDOWN:");
+            int score = 0;
+            int addition;
+            addition = numFightTurns * 1;
+            Console.WriteLine("Time spent fighting: " + Convert.ToString(addition));
+            score += addition;
+            addition = world.turnNum * 10;
+            Console.WriteLine("Total number of turns: " + Convert.ToString(addition));
+            score += addition;
+            addition = (world.aurora.maxHealth - world.aurora.health) * 5;
+            Console.WriteLine("Final health: " + Convert.ToString(addition));
+            score += addition;
+            addition = world.aurora.attack[0] * (1);
+            Console.WriteLine("Aurora's Accuracy: " + Convert.ToString(addition));
+            score += addition;
+            addition = world.aurora.attack[1] * (1);
+            Console.WriteLine("Aurora's Power: " + Convert.ToString(addition));
+            score += addition;
+            addition = world.trollKing.maxHealth * (-1);
+            Console.WriteLine("Troll King's Max Health: " + Convert.ToString(addition));
+            score += addition;
+            addition = world.trollKing.attack[0] * (-1);
+            Console.WriteLine("Troll King's Accuracy: " + Convert.ToString(addition));
+            score += addition;
+            addition = world.trollKing.attack[1] * (-1);
+            Console.WriteLine("Troll King's Power: " + Convert.ToString(addition));
+            score += addition;
+            addition = world.gold * (-1);
+            Console.WriteLine("Final amount of gold: " + Convert.ToString(addition));
+            score += addition;
 
-                }
-            }
-
+            return score;
         }
+
         [System.Runtime.InteropServices.DllImport("gdi32.dll")]
         public static extern bool DeleteObject(IntPtr hObject); // add this function to dispose variables to prevent memory leaks
+
+
 
         // FANCY FUNCTIONS //
         public static void PrettyPrint(string text, int delay)
@@ -1657,7 +1710,7 @@ namespace Trurene_RPG
 
                 if (Keyboard.IsKeyDown(StringToKey("Right"))) // If RIGHT ARROW is being pressed
                 {
-                    Thread.Sleep(delay / 5); // Short delay
+                    Thread.Sleep(delay / 10); // Short delay
                 }
                 else
                 {
@@ -1755,7 +1808,8 @@ namespace Trurene_RPG
         public static System.Windows.Application NormalUI = new System.Windows.Application(); // Create a new application (WPF)
         public static SoundPlayer backgroundMusic = new SoundPlayer(@"data/audio/background1.wav");
         public static string backgroundMusicTrack = "normal";
-        public static bool firstUIUpdate = false; 
+        public static bool firstUIUpdate = false;
+        public static int numFightTurns = 0;
 
         // Game vars
         public static bool gameOver = false; // This is checked each turn to make sure that the game is not over
@@ -1770,6 +1824,7 @@ namespace Trurene_RPG
         public static bool fightingTrollKing = false;
         public static bool fightingWolves = false;
         public static bool goblinArtefactUsed = false;
+        public static bool weaponDamaged = false;
         public static bool hawkOmniscience = false;
         public static List<FormattedText> notificationsQueue = new List<FormattedText>(); // This is the text which still needs to be added to the notifications
 

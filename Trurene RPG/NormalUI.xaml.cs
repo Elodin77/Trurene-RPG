@@ -144,7 +144,7 @@ namespace Trurene_RPG
         {
             if (Program.fighting)
             {
-                Program.fightAction = "Strike";
+                Program.fightAction = "Retreat";
                 Program.NextTurn();
             }
         }
@@ -154,7 +154,7 @@ namespace Trurene_RPG
 
         public void TutorialButtonClick(object sender, RoutedEventArgs e)
         {
-            TutorialButton.Background = Brushes.Gray;
+            TutorialButton.Background = Brushes.Blue;
             /* This function goes through each piece of text on the UI, highlights it, and tells the user what it is.
              * It is like a super quick start guide for users who just want to learn what each button is.
              */
@@ -181,7 +181,7 @@ namespace Trurene_RPG
             // End
             CustomMessageBox.ShowText("Congratulations, this is the end of the tutorial. Now go save Trurene!!!", "TUTORIAL", GOLD_BACK, GOLD_FORE);
 
-            TutorialButton.Background = Brushes.LightGray;
+            TutorialButton.Background = Brushes.LightBlue;
         }
         
         // Functions on timers (repeated after certain interval)
@@ -199,7 +199,7 @@ namespace Trurene_RPG
                         // Change button colours to be uniform
                         SaveButton.Background = Brushes.LightGray;
                         LoadButton.Background = Brushes.LightGray;
-                        TutorialButton.Background = Brushes.LightGray;
+                        TutorialButton.Background = Brushes.LightBlue;
 
                         Program.firstUIUpdate = true;
                     }
@@ -325,6 +325,16 @@ namespace Trurene_RPG
                         EnemyHealthProgressBar.Maximum = 1;
                         EnemyHealthProgressBar.Value = 0;
                     }
+                    // Show a red background temporarily if the player's weapon was damaged.
+                    if (Program.weaponDamaged)
+                    {
+                        WindowGrid.Background = Brushes.Red;
+                        Program.weaponDamaged = false;
+                    }
+                    else
+                    {
+                        WindowGrid.Background = Brushes.Transparent;
+                    }
 
 
                 });
@@ -345,7 +355,8 @@ namespace Trurene_RPG
             {
                 if (Convert.ToBoolean(checkAutoSave.IsChecked))
                 {
-                    Program.Save("autosave.txt");
+                    Program.Save("autosave");
+                    Program.AddNotification("The game was autosaved!\n", new DependencyProperty[] { TextElement.ForegroundProperty }, new object[] { Brushes.PaleGreen });
                 }
             });
         }
@@ -413,11 +424,28 @@ namespace Trurene_RPG
         public void OnShutdown(object sender, System.ComponentModel.CancelEventArgs e)
         {
             /* This function stops all of the threads, timers... to prevent any exceptions occuring by the tasks being cancelled.
+             * And it also adds a little bit of a twist.
              */
             PrepareTimer.Stop();
             SaveTimer.Stop();
             UpdateEverythingTimer.Stop();
             UpdateNotificationsTimer.Stop();
+            if (Program.world.aurora.health <= 0)
+            {
+                CustomMessageBox.ShowText("Keep trying, keep an eye on your health.", "THE END", WARNING_BACK, WARNING_FORE);
+            }
+            else if (Program.world.trollKing.health <= 0)
+            {
+                CustomMessageBox.ShowText("Very well done.", "THE END", GOLD_BACK, GOLD_FORE);
+                CustomMessageBox.ShowText("Your score is: " + Convert.ToString(Program.world.turnNum), "THE END", GOLD_BACK, GOLD_FORE);
+            }
+            else
+            {
+                CustomMessageBox.ShowText("Trurene needs you. Don't give up.","THE END",WARNING_BACK,WARNING_FORE);
+            }
+            Thread.Sleep(1000);
+
+            
         }
 
 

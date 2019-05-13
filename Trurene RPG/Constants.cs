@@ -153,21 +153,21 @@ namespace Trurene_RPG
         // Weapon creation from gold
         public struct MaceInfo
         {
-            public const double ACCURACY_MULTIPLIER = 1;
-            public const double POWER_MULTIPLIER = 1.2;
-            public const double TIME_QUOTIENT = 300.0; // This is inversly multiplied by the gold
+            public const double ACCURACY_MULTIPLIER = 1.1;
+            public const double POWER_MULTIPLIER = 0.8;
+            public const double TIME_QUOTIENT = 250.0; // This is inversly multiplied by the gold
         }
         public struct SwordInfo
         {
-            public const double ACCURACY_MULTIPLIER = 1;
-            public const double POWER_MULTIPLIER = 0.7;
+            public const double ACCURACY_MULTIPLIER = 1.2;
+            public const double POWER_MULTIPLIER = 0.6;
             public const double TIME_QUOTIENT = 200.0; // This is inversly multiplied by the gold
         }
         public struct DaggerInfo
         {
-            public const double ACCURACY_MULTIPLIER = 1;
-            public const double POWER_MULTIPLIER = 0.3;
-            public const double TIME_QUOTIENT = 100.0; // This is inversly multiplied by the gold
+            public const double ACCURACY_MULTIPLIER = 1.3;
+            public const double POWER_MULTIPLIER = 0.4;
+            public const double TIME_QUOTIENT = 150.0; // This is inversly multiplied by the gold
         }
 
         // Miscellaneous Constants
