@@ -2,6 +2,8 @@
 
 This is a game which I, Djimon Jayasundera, have made as part of a submission for a Computer Science project. Expect bugs, errors and some incorrect information in the files contained in this repository. 
 
+I would be happy for you to contact me for feedback or any other matter. My personal email is djimondjayasundera@icloud.com.
+
 ## Feedback
 
 Feedback is greatly appreciated and can be given through the form at https://forms.gle/rNMHBPLkZixPSEyX6.
