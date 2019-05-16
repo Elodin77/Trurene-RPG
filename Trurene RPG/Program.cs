@@ -16,7 +16,10 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 My personal email is <djimondjayasundera@icloud.com>, my school email is <1015097@student.ccgs.wa.edu.au>.
-More information about the project (including downloads, maps, license, and manual) can be found at <https://github.com/Elodin77/Trurene-RPG/>.
+More information about the project (including downloads, the license, and manuals) can be found at <https://github.com/Elodin77/Trurene-RPG/>.
+
+This file contains all of the functions important for the actual game algorithms. This doesn't 
+include anything directly related to the Windows Processing Form User Interface.
  */
 
 
@@ -73,6 +76,7 @@ namespace Trurene_RPG
             Console.Write(new string(' ', (Console.WindowWidth - text.Length) / 2));
             Console.WriteLine(text);
             Thread.Sleep(2000);
+            Console.WriteLine("\n\n\nPRESS ANY KEY TO CONTINUE");
             Console.ReadKey();
             Console.Clear();
 
@@ -80,7 +84,7 @@ namespace Trurene_RPG
             string lore = File.ReadAllText("data/lore.txt", Encoding.UTF8); // Read in the lore
             Console.WriteLine("Press the <RIGHT ARROW> to speed up the lore");
 
-            PrettyPrint(lore, 50); // Print out the lore
+            PrettyPrint(lore, 30); // Print out the lore
 
             Console.WriteLine("\n\n\nPRESS ANY KEY TO CONTINUE");
             Thread.Sleep(500);
@@ -88,10 +92,16 @@ namespace Trurene_RPG
             Console.ReadKey();
             Console.Clear();
             string entry = "";
+            bool failed = false;
             do
             {
+                if (failed)
+                {
+                    Console.WriteLine("That is an invalid input! Make sure to input in CAPITALS.");
+                }
                 Console.Write("Do you want to create a new game or continue a current game ('NEW'/'CONTINUE'): ");
                 entry = Console.ReadLine();
+                failed = true;
             } while (entry != "NEW" && entry != "CONTINUE");
             if (entry == "NEW")
             {
@@ -105,7 +115,10 @@ namespace Trurene_RPG
                         enteredSize = Convert.ToInt32(Console.ReadLine());
                         completed = true;
                     }
-                    catch { }
+                    catch
+                    {
+                        Console.WriteLine("That is an invalid input!");
+                    }
                 } while (!completed || enteredSize < 7 || enteredSize > 12);
                 GenerateRandomWorld(enteredSize);
             }
@@ -1712,14 +1725,15 @@ namespace Trurene_RPG
                 {
                     Thread.Sleep(delay / 10); // Short delay
                 }
+                else if (c == '\n')
+                {
+                    Thread.Sleep(1000); // Dramatic pause
+                }
                 else
                 {
                     Thread.Sleep(delay); // Long delay
                 }
-                if (c == '\n')
-                {
-                    Thread.Sleep(1000); // Dramatic pause
-                }
+
 
             }
             Console.WriteLine();

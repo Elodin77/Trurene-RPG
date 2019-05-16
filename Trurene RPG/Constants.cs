@@ -4,6 +4,7 @@
  * as possible for the user. This also has constants which do not change and won't
  * be "fine-tuned", but instead these constants are just here to make it easy to
  * find their initialisation and understand what they do.
+ * As is the common convention, all of these variables are declared in all CAPITALS.
  * 
  */
 
