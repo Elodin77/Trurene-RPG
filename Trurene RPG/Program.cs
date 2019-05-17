@@ -1518,7 +1518,7 @@ namespace Trurene_RPG
                 lines[21] += " ";
             }
             lines[21] += Convert.ToString(world.shrines[world.shrines.Count() - 1].solved);
-
+            lines[22] = Convert.ToString(numFightTurns);
 
             // Delete any existing files
             if (File.Exists("saves/" + filename))
@@ -1633,6 +1633,7 @@ namespace Trurene_RPG
                     world.shrines[i].solved = Convert.ToInt32(tempArray[i]);
                 }
             }
+            numFightTurns = Convert.ToInt32(gameState.Split('\n')[22]);
 
 
 
@@ -1660,6 +1661,7 @@ namespace Trurene_RPG
             world.wolves.maxHealth = 1;
             world.wolves.health = 1;
             world.turnNum = 0;
+            numFightTurns = 0;
 
 
         }
