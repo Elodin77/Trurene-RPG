@@ -335,6 +335,16 @@ namespace Trurene_RPG
                     {
                         WindowGrid.Background = Brushes.Transparent;
                     }
+                    if (Program.fightingTrollKing) // update troll king's statistics
+                    {
+
+                        Program.world.trollKing = Program.CreatureToCharacter(Program.enemy, Program.world.trollKing); // Update trollKing
+                    }
+                    if (Program.fightingWolves) // update wolves' statistics
+                    {
+                        Console.WriteLine(Program.world.wolves.health);
+                        Program.world.wolves = Program.CreatureToCharacter(Program.enemy, Program.world.wolves); // Update wolves
+                    }
 
 
                 });

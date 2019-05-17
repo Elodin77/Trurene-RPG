@@ -59,7 +59,6 @@ namespace Trurene_RPG
 
             // Create default values
             GenerateDefaultValues();
-
             // Show title 
             string text = "|Trurene - The RPG|";
             Console.Write(new string(' ', (Console.WindowWidth - text.Length) / 2)); // this is used to centre the text
@@ -605,7 +604,7 @@ namespace Trurene_RPG
                     world.wolves.health = world.wolves.maxHealth;
                 }
             }
-            else if (!fighting) 
+            else if (world.wolves.health <= 0) 
             {
                 // Respawn the wolves because they must have been killed
                 world.wolves.health = world.wolves.maxHealth;
@@ -775,7 +774,6 @@ namespace Trurene_RPG
             
             if (enemy.health <= 0)
             {
-                enemy.health = 1; // To stop this happening multiple times.
                 world.gold += enemy.reward;
                 PlaySound("coin.wav", 1.0);
                 AddNotification("You found " + Convert.ToString(enemy.reward) + "G on the creature!\n", new DependencyProperty[] { TextElement.ForegroundProperty }, new object[] { Brushes.Gold });
@@ -810,17 +808,7 @@ namespace Trurene_RPG
             {
                 CustomMessageBox.ShowText("There is nothing for me to teach you!", "MAEJA", WARNING_BACK, WARNING_FORE);
             }
-            if (fightingTrollKing) // update troll king's statistics
-            {
 
-                Creature trollKing = enemy;
-                world.trollKing = CreatureToCharacter(trollKing, world.trollKing); // Update trollKing
-            }
-            if (fightingWolves) // update wolves' statistics
-            {
-                Creature wolves = enemy;
-                world.wolves = CreatureToCharacter(wolves, world.wolves); // Update wolves
-            }
         }
         public static void DoShrine()
         {
@@ -1379,7 +1367,7 @@ namespace Trurene_RPG
              */
             old.health = updated.health;
             // The reason why the attack is not updated, is because the wolves and troll king cannot have
-            // their weapons broken.
+            // their weapons permanently broken.
             return old;
         }
         public static int DistanceBetween(Position pos1, Position pos2)
