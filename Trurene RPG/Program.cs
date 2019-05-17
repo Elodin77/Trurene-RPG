@@ -476,6 +476,7 @@ namespace Trurene_RPG
              * and NPCs including the Troll King, the wolves, villages, shrines, and random fights.
              * 
              */
+            Thread.Sleep(500); // to stop the character from moving too much.
             fighting = false;
             fightingTrollKing = false;
             fightingWolves = false;
@@ -494,7 +495,7 @@ namespace Trurene_RPG
             }
             // Otherwise, check if Aurora enters a village
             // This way she cannot enter a village which has just been destroyed the same turn.
-            else if (world.villagePositions.Contains(world.aurora.pos)) // villages are safe from wolves
+            else if (world.villagePositions.Contains(world.aurora.pos) && !world.destroyedVillages.Contains(world.aurora.pos)) // villages are safe from wolves
             {
                 DoVillage();
                 somethingHappened = true;
