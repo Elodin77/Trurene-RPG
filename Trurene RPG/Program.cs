@@ -352,7 +352,7 @@ namespace Trurene_RPG
             // Move Hawk if he is on a destroyed village
             if (world.destroyedVillages.Contains(world.hawkPosition))
             {
-                world.hawkPosition = world.villagePositions.Except(world.destroyedVillages).ToList()[random.Next(world.villagePositions.Length)];
+                world.hawkPosition = world.villagePositions.Except(world.destroyedVillages).ToList()[random.Next(world.villagePositions.Length - world.destroyedVillages.Count())];
             }
             // Move NPCs
             if (world.turnNum % 2 == 0)
@@ -1474,7 +1474,7 @@ namespace Trurene_RPG
 
 
             // Create a string array 
-            string[] lines = new string[22];
+            string[] lines = new string[23];
             lines[0] = Convert.ToString(world.rows) + " " + Convert.ToString(world.cols) + " " + Convert.ToString(world.turnNum) + " " + Convert.ToString(world.numVillages) + " " + Convert.ToString(world.numShrines);
             lines[1] = Convert.ToString(world.hawkPosition.row) + " " + Convert.ToString(world.hawkPosition.col);
             lines[2] = Convert.ToString(world.maejaPosition.row) + " " + Convert.ToString(world.maejaPosition.col);
