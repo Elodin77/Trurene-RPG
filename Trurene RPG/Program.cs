@@ -76,7 +76,9 @@ namespace Trurene_RPG
             Console.WriteLine(text);
             Thread.Sleep(2000);
             Console.WriteLine("\n\n\nPRESS ANY KEY TO CONTINUE");
-            Console.ReadKey();
+            Thread.Sleep(500);
+            FlushKeyboard();
+            Console.ReadKey(true);
             Console.Clear();
 
             // Show the lore
@@ -87,7 +89,7 @@ namespace Trurene_RPG
             Console.WriteLine("\n\n\nPRESS ANY KEY TO CONTINUE");
             Thread.Sleep(500);
             FlushKeyboard();
-            Console.ReadKey();
+            Console.ReadKey(true);
             Console.Clear();
             string entry = "";
             bool failed = false;
@@ -153,9 +155,7 @@ namespace Trurene_RPG
             Console.WriteLine("\n\n\nPRESS ANY KEY TO CONTINUE");
             Thread.Sleep(500);
             FlushKeyboard();
-            Console.ReadKey();
-
-
+            Console.ReadKey(true);
             Console.Clear();
 
             // detect all folders in resource packs directory
@@ -207,7 +207,7 @@ namespace Trurene_RPG
             Console.WriteLine("\n\n\nPRESS ANY KEY TO CONTINUE");
             Thread.Sleep(500);
             FlushKeyboard();
-            Console.ReadKey();
+            Console.ReadKey(true);
             Console.Clear();
 
             UnitTesting.RunUnitTesting(); // Run the testing
@@ -223,8 +223,15 @@ namespace Trurene_RPG
             NormalUI.StartupUri = new Uri("NormalUI.xaml", System.UriKind.Relative); // Make the app run code on startup
             NormalUI.Run(); // Run the app
             // Finish the game
-            
+
+            int score = CalculateScore();
+
+            Console.WriteLine("\n\n\nPRESS ANY KEY TO CONTINUE");
+            Thread.Sleep(500);
+            FlushKeyboard();
+            Console.ReadKey(true);
             Console.Clear();
+
             text = "|Trurene - The RPG|";
             Console.Write(new string(' ', (Console.WindowWidth - text.Length) / 2)); // this is used to centre the text
             Console.WriteLine(new String('-', text.Length));
@@ -629,7 +636,6 @@ namespace Trurene_RPG
 
             }
             UpdateBackgroundMusic();
-            Thread.Sleep(300); // to stop the character from moving too fast and teleporting.
 
         }
         public static bool DoFightTurn()
@@ -1693,6 +1699,8 @@ namespace Trurene_RPG
             addition = world.gold * (-1);
             Console.WriteLine("Final amount of gold: " + Convert.ToString(addition));
             score += addition;
+            
+            Console.WriteLine("\nFinal score: " + Convert.ToString(score));
 
             return score;
         }

@@ -40,7 +40,7 @@ namespace Trurene_RPG
             // Start the timer to continually update the UI
             UpdateEverythingTimer = new System.Timers.Timer();
             UpdateEverythingTimer.Elapsed += new ElapsedEventHandler(UpdateEverything);
-            UpdateEverythingTimer.Interval = 100; // this is a very costly function to run, so it has a reasonable time interval
+            UpdateEverythingTimer.Interval = 500; // this is a very costly function to run, so it has a reasonable time interval
             UpdateEverythingTimer.Enabled = true;
             // Start the timer to autosave
             SaveTimer = new System.Timers.Timer();
@@ -447,7 +447,7 @@ namespace Trurene_RPG
             else if (Program.world.trollKing.health <= 0)
             {
                 CustomMessageBox.ShowText("Very well done.", "THE END", GOLD_BACK, GOLD_FORE);
-                CustomMessageBox.ShowText("Your score is: " + Convert.ToString(Program.world.turnNum), "THE END", GOLD_BACK, GOLD_FORE);
+                
             }
             else
             {
