@@ -500,6 +500,10 @@ namespace Trurene_RPG
                 DoVillage();
                 somethingHappened = true;
             }
+            else if (world.destroyedVillages.Contains(world.aurora.pos))
+            {
+                AddNotification("You see a destroyed village. There is nobody left.\n", new DependencyProperty[] { TextElement.ForegroundProperty }, new object[] { Brushes.Red });
+            }
             // Check if Aurora is on Maeja's location
             if (DistanceBetween(world.aurora.pos, world.maejaPosition) == 0) // maeja's house is safe from wolves
             {
