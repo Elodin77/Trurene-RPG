@@ -346,7 +346,6 @@ namespace Trurene_RPG
             if (DistanceBetween(world.trollKing.pos, world.targetVillagePosition) == 0)
             {
                 world.destroyedVillages.Add(world.trollKing.pos);
-                // [todo] bug here
                 world.targetVillagePosition = world.villagePositions.Except(world.destroyedVillages).ToList()[random.Next(world.villagePositions.Length - world.destroyedVillages.Count() - 1)];
             }
             // Move Hawk if he is on a destroyed village
