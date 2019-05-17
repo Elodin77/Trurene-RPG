@@ -643,7 +643,7 @@ namespace Trurene_RPG
             /* This function runs the interaction for the fighting. 
              * The enemy is a global variable so that the WPF application can access it.
              */
-            numFightTurns += 1; // High score is bad
+            world.numFightTurns += 1; // High score is bad
             bool enemyStrike = false;
             bool auroraStrike = false;
             bool retreated = false;
@@ -1518,7 +1518,7 @@ namespace Trurene_RPG
                 lines[21] += " ";
             }
             lines[21] += Convert.ToString(world.shrines[world.shrines.Count() - 1].solved);
-            lines[22] = Convert.ToString(numFightTurns);
+            lines[22] = Convert.ToString(world.numFightTurns);
 
             // Delete any existing files
             if (File.Exists("saves/" + filename))
@@ -1633,7 +1633,7 @@ namespace Trurene_RPG
                     world.shrines[i].solved = Convert.ToInt32(tempArray[i]);
                 }
             }
-            numFightTurns = Convert.ToInt32(gameState.Split('\n')[22]);
+            world.numFightTurns = Convert.ToInt32(gameState.Split('\n')[22]);
 
 
 
@@ -1661,7 +1661,7 @@ namespace Trurene_RPG
             world.wolves.maxHealth = 1;
             world.wolves.health = 1;
             world.turnNum = 0;
-            numFightTurns = 0;
+            world.numFightTurns = 0;
 
 
         }
@@ -1674,7 +1674,7 @@ namespace Trurene_RPG
             Console.WriteLine("SCORE BREAKDOWN:");
             int score = 0;
             int addition;
-            addition = numFightTurns * 1;
+            addition = world.numFightTurns * 1;
             Console.WriteLine("Time spent fighting: " + Convert.ToString(addition));
             score += addition;
             addition = world.turnNum * 10;
@@ -1826,7 +1826,7 @@ namespace Trurene_RPG
         public static SoundPlayer backgroundMusic = new SoundPlayer(@"data/audio/background1.wav");
         public static string backgroundMusicTrack = "normal";
         public static bool firstUIUpdate = false;
-        public static int numFightTurns = 0;
+        public static int world.numFightTurns = 0;
 
         // Game vars
         public static bool gameOver = false; // This is checked each turn to make sure that the game is not over
@@ -1855,6 +1855,7 @@ namespace Trurene_RPG
             public int turnNum;
             public int numVillages;
             public int numShrines;
+            public int numFightTurns;
             // Locations
             public Position questPosition;
             public Position maejaPosition;
