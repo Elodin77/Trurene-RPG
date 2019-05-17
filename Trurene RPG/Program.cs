@@ -1681,7 +1681,7 @@ namespace Trurene_RPG
             Console.WriteLine("Total number of turns: " + Convert.ToString(addition));
             score += addition;
             addition = (world.aurora.maxHealth - world.aurora.health) * 5;
-            Console.WriteLine("Final health: " + Convert.ToString(addition));
+            Console.WriteLine("Aurora's Final health: " + Convert.ToString(addition));
             score += addition;
             addition = world.aurora.attack[0] * (1);
             Console.WriteLine("Aurora's Accuracy: " + Convert.ToString(addition));
@@ -1703,6 +1703,7 @@ namespace Trurene_RPG
             score += addition;
             
             Console.WriteLine("\nFinal score: " + Convert.ToString(score));
+            Console.WriteLine("\nP.S. The lower the score the better you did.");
 
             return score;
         }
