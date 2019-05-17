@@ -1826,7 +1826,6 @@ namespace Trurene_RPG
         public static SoundPlayer backgroundMusic = new SoundPlayer(@"data/audio/background1.wav");
         public static string backgroundMusicTrack = "normal";
         public static bool firstUIUpdate = false;
-        public static int world.numFightTurns = 0;
 
         // Game vars
         public static bool gameOver = false; // This is checked each turn to make sure that the game is not over
