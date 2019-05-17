@@ -1675,13 +1675,13 @@ namespace Trurene_RPG
             int score = 0;
             int addition;
             addition = world.numFightTurns * 1;
-            Console.WriteLine("Time spent fighting: " + Convert.ToString(addition));
+            Console.WriteLine("Time Spent Fighting: " + Convert.ToString(addition));
             score += addition;
             addition = world.turnNum * 10;
-            Console.WriteLine("Total number of turns: " + Convert.ToString(addition));
+            Console.WriteLine("Total Number of Turns: " + Convert.ToString(addition));
             score += addition;
             addition = (world.aurora.maxHealth - world.aurora.health) * 5;
-            Console.WriteLine("Aurora's Final health: " + Convert.ToString(addition));
+            Console.WriteLine("Aurora's Damage Taken: " + Convert.ToString(addition));
             score += addition;
             addition = world.aurora.attack[0] * (1);
             Console.WriteLine("Aurora's Accuracy: " + Convert.ToString(addition));
