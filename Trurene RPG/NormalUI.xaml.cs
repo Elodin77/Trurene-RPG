@@ -40,7 +40,7 @@ namespace Trurene_RPG
             // Start the timer to continually update the UI
             UpdateEverythingTimer = new System.Timers.Timer();
             UpdateEverythingTimer.Elapsed += new ElapsedEventHandler(UpdateEverything);
-            UpdateEverythingTimer.Interval = 500; // this is a very costly function to run, so it has a reasonable time interval
+            UpdateEverythingTimer.Interval = 100; // this is a very costly function to run, so it has a reasonable time interval
             UpdateEverythingTimer.Enabled = true;
             // Start the timer to autosave
             SaveTimer = new System.Timers.Timer();

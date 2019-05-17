@@ -476,7 +476,7 @@ namespace Trurene_RPG
              * and NPCs including the Troll King, the wolves, villages, shrines, and random fights.
              * 
              */
-            Thread.Sleep(500); // to stop the character from moving too much.
+
             fighting = false;
             fightingTrollKing = false;
             fightingWolves = false;
@@ -629,6 +629,7 @@ namespace Trurene_RPG
 
             }
             UpdateBackgroundMusic();
+            Thread.Sleep(300); // to stop the character from moving too fast and teleporting.
 
         }
         public static bool DoFightTurn()
