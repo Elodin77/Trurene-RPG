@@ -882,12 +882,12 @@ namespace Trurene_RPG
             }
             else if (learning)
             {
-                AddNotification("You cannot get another artefact. You must go to Maeja to learn how to use the artefact you currently have!\n", new DependencyProperty[] { TextElement.ForegroundProperty }, new object[] { Brushes.Red });
+                AddNotification("You see a shrine, but decide to wait until you show Maeja the one you already have.\n", new DependencyProperty[] { TextElement.ForegroundProperty }, new object[] { Brushes.Red });
 
             }
             else
             {
-                AddNotification("You have already solved this shrine!\n", new DependencyProperty[] { TextElement.ForegroundProperty }, new object[] { Brushes.Red });
+                AddNotification("You see a shrine, but realise that it has no artefact in it. Because you already took it.\n", new DependencyProperty[] { TextElement.ForegroundProperty }, new object[] { Brushes.Red });
             }
         }
         public static void DoVillage() 
