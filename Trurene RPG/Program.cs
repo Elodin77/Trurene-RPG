@@ -85,7 +85,6 @@ namespace Trurene_RPG
             Console.WriteLine("Press the <RIGHT ARROW> to speed up the lore");
 
             PrettyPrint(lore, 30); // Print out the lore
-
             Console.WriteLine("\n\n\nPRESS ANY KEY TO CONTINUE");
             Thread.Sleep(500);
             FlushKeyboard();
