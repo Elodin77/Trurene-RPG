@@ -56,7 +56,7 @@ namespace Trurene_RPG
              * of the game and the very end, but not the actual game itself. Because of the
              * nature of the User Interface. The UI actually coordinates and runs the game.
              */
-
+            Thread.Sleep(500);
             // Create default values
             GenerateDefaultValues();
             // Show title 
@@ -1749,7 +1749,7 @@ namespace Trurene_RPG
              */
             while (Console.KeyAvailable == true)
             {
-                Console.ReadKey();
+                Console.ReadKey(true);
             }
         }
         public static void UpdateBackgroundMusic()
