@@ -1,13 +1,10 @@
 # Trurene - The RPG
-
 This is a game which I, DJ, have made as part of a submission for a Computer Science project. Expect bugs, errors and some incorrect information in the files contained in this repository. 
 
-I would be happy for you to contact me for feedback or any other matter. My personal email is djimondjayasundera@gmail.com.
-
+I would be happy for you to contact me for feedback or any other matter. My personal email is djimondjayasundera@gmail.com
 ## Download/Run
 
 Download the zip file [here](https://drive.google.com/file/d/1N83e_JdJyPF9xXsPHbBKWK85RdzZC32b/view?usp=sharing), cloning/downloading the repository may not work.
-
 ## Feedback
 
 Feedback is greatly appreciated and can be given through the form at https://forms.gle/rNMHBPLkZixPSEyX6.
