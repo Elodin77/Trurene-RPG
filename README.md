@@ -1,6 +1,21 @@
 ## Download/Run
 
-Download the zip file **[here](https://drive.google.com/file/d/1N83e_JdJyPF9xXsPHbBKWK85RdzZC32b/view?usp=sharing)**, cloning/downloading the repository may not work.
+1. Download the zip file **[here](https://drive.google.com/file/d/1N83e_JdJyPF9xXsPHbBKWK85RdzZC32b/view?usp=sharing)**, cloning/downloading the repository may not work.
+
+2. Open the `Trurene RPG` folder inside the outer folder (with the same name). Then right click the `Trurene RPG.csproj` file and open with Notepad or other text editing program (NOT visual studio). Scroll through the document and delete the following block of text from the file: 
+
+`  <PropertyGroup>
+    <ManifestCertificateThumbprint>CC65C72DFFBAD6A5AA1509F70C55E7DF874ECB10</ManifestCertificateThumbprint>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ManifestKeyFile>Trurene RPG_TemporaryKey.pfx</ManifestKeyFile>
+  </PropertyGroup>
+  <PropertyGroup>
+    <GenerateManifests>true</GenerateManifests>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignManifests>true</SignManifests>
+  </PropertyGroup>`
 
 It may take some time to download:
 * Part 1 Documentation: 10000 words
