@@ -144,7 +144,7 @@ namespace Trurene_RPG
         // Text box color constants
         public static Color SUCCESS_FORE = Color.LightGreen;
         public static Color SUCCESS_BACK = Color.DarkGreen;
-        public static Color WARNING_FORE = Color.OrangeRed;
+        public static Color WARNING_FORE = Color.Red;
         public static Color WARNING_BACK = Color.DarkRed;
         public static Color GOLD_FORE = Color.LightGoldenrodYellow;
         public static Color GOLD_BACK = Color.DarkGoldenrod;

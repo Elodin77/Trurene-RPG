@@ -1,6 +1,6 @@
 ﻿/*
 Trurene - The RPG is a console based game created for a school project.
-Copyright (C) 2019  Djimon Jayasundera
+Copyright (C) 2020  Djimon Jayasundera
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -15,7 +15,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-My personal email is <djimondjayasundera@icloud.com>, my school email is <1015097@student.ccgs.wa.edu.au>.
+My personal email is <djimondjayasundera@gmail.com>, my school email is <1015097@student.ccgs.wa.edu.au>.
 More information about the project (including downloads, the license, and manuals) can be found at <https://github.com/Elodin77/Trurene-RPG/>.
 
 This file contains all of the functions important for the actual game algorithms. This doesn't 
@@ -85,7 +85,7 @@ namespace Trurene_RPG
             string lore = File.ReadAllText("data/lore.txt", Encoding.UTF8); // Read in the lore
             Console.WriteLine("Press the <RIGHT ARROW> to speed up the lore");
 
-            PrettyPrint(lore, 30); // Print out the lore
+            PrettyPrint(lore, 30); // Print out the lore... prettily
             Console.WriteLine("\n\n\nPRESS ANY KEY TO CONTINUE");
             Thread.Sleep(500);
             FlushKeyboard();
@@ -97,13 +97,13 @@ namespace Trurene_RPG
             {
                 if (failed)
                 {
-                    Console.WriteLine("That is an invalid input! Make sure to input in CAPITALS.");
+                    Console.WriteLine("That is an invalid input! Copy one of the input options!");
                 }
                 Console.Write("Do you want to create a new game or continue a current game ('NEW'/'CONTINUE'): ");
-                entry = Console.ReadLine();
+                entry = Console.ReadLine().ToLower();
                 failed = true;
-            } while (entry != "NEW" && entry != "CONTINUE");
-            if (entry == "NEW")
+            } while (entry != "new" && entry != "continue");
+            if (entry == "new")
             {
                 int enteredSize = 1;
                 bool completed = false;
@@ -198,7 +198,7 @@ namespace Trurene_RPG
                 }
                 catch
                 {
-                    Console.WriteLine("Either that doesn't exist or the format is wrong!!!");
+                    Console.WriteLine("Either that doesn't exist or the format is wrong! Copy the name of the resource pack!");
                 }
             }
 
@@ -850,41 +850,51 @@ namespace Trurene_RPG
                 int num2 = random.Next(100);
                 CustomMessageBox.ShowText("Press OK when you are ready. You must enter within 5 seconds to open the secret door!", "SHRINE", NORMAL_BACK, NORMAL_FORE);
                 DateTime time1 = DateTime.Now;
-                string answer = CustomMessageBox.ShowTextEntry("What is " + Convert.ToString(num1) + " + " + Convert.ToString(num2),"SHRINE");
+                string answer = CustomMessageBox.ShowTextEntry("What is " + Convert.ToString(num1) + " + " + Convert.ToString(num2), "SHRINE");
                 DateTime time2 = DateTime.Now;
                 double diffInSeconds = (time1 - time2).TotalSeconds;
-                if (diffInSeconds<=5 && Convert.ToInt32(answer) == num1+num2) 
+                try
                 {
-                    AddNotification("The door closes behind you and a secret doorway opens. An artefact is glowing in the darkness!\n", new DependencyProperty[] { TextElement.ForegroundProperty }, new object[] { Brushes.Green });
-                    if (world.spells[0] == 2 && world.spells[1] == 2 && world.spells[2] == 2) // Check if it is time to learn Omniscience
+                    if (diffInSeconds <= 5 && Convert.ToInt32(answer) == num1 + num2)
                     {
-                        index = 3;
+                        AddNotification("The door closes behind you and a secret doorway opens. An artefact is glowing in the darkness!\n", new DependencyProperty[] { TextElement.ForegroundProperty }, new object[] { Brushes.Green });
+                        if (world.spells[0] == 2 && world.spells[1] == 2 && world.spells[2] == 2) // Check if it is time to learn Omniscience
+                        {
+                            index = 3;
+                        }
+                        else
+                        {
+                            do
+                            {
+                                index = random.Next(3);
+                            } while (world.spells[index] == 2);
+                        }
+                        AddNotification("You pick it up and see that it is the " + artefacts[index] + "\n", new DependencyProperty[] { TextElement.ForegroundProperty }, new object[] { Brushes.Gold });
+                        world.spells[index] = 1;
+                        // Find the shrine and set it to solved.
+                        for (int i = 0; i < 4; i++)
+                        {
+                            if (DistanceBetween(world.shrines[i].pos, shrine.pos) == 0)
+                            {
+                                world.shrines[i].solved = 1;
+                                break;
+                            }
+                        }
+
+
                     }
+
+
                     else
                     {
-                        do
-                        {
-                            index = random.Next(3);
-                        } while (world.spells[index] == 2);
+                        AddNotification("The question vanishes and... nothing happens\n", new DependencyProperty[] { TextElement.ForegroundProperty }, new object[] { Brushes.Red });
                     }
-                    AddNotification("You pick it up and see that it is the " + artefacts[index] + "\n", new DependencyProperty[] { TextElement.ForegroundProperty }, new object[] { Brushes.Gold });
-                    world.spells[index] = 1;
-                    // Find the shrine and set it to solved.
-                    for (int i = 0;i<4;i++)
-                    {
-                        if (DistanceBetween(world.shrines[i].pos, shrine.pos) == 0)
-                        {
-                            world.shrines[i].solved = 1;
-                            break;
-                        }
-                    }
-
-
                 }
-                else
+                catch
                 {
                     AddNotification("The question vanishes and... nothing happens\n", new DependencyProperty[] { TextElement.ForegroundProperty }, new object[] { Brushes.Red });
                 }
+            
             }
             else if (learning)
             {
@@ -973,12 +983,12 @@ namespace Trurene_RPG
              * This NPC is actually the most complicated who is able to have an attitude towards
              * Aurora depending on her behaviour. This results in different weapon values.
              */
-            string weapon = CustomMessageBox.ShowTextEntry("What weapon do you want ('MACE'/'SWORD'/'DAGGER')", "MERCHANT");
+            string weapon = CustomMessageBox.ShowTextEntry("What weapon do you want ('MACE'/'SWORD'/'DAGGER')", "MERCHANT").ToLower();
             string message = "";
-            while (weapon != "MACE" && weapon != "SWORD" && weapon != "DAGGER")
+            while (weapon != "mace" && weapon != "sword" && weapon != "dagger")
             {
                 CustomMessageBox.ShowText("Sorry, but I don't sell that.", "MERCHANT", WARNING_BACK, WARNING_FORE);
-                weapon = CustomMessageBox.ShowTextEntry("What weapon do you want ('MACE'/'SWORD'/'DAGGER')", "MERCHANT");
+                weapon = CustomMessageBox.ShowTextEntry("What weapon do you want ('MACE'/'SWORD'/'DAGGER')", "MERCHANT").ToLower();
             }
             CustomMessageBox.ShowText("Yes, I can get you one of those.", "MERCHANT", SUCCESS_BACK, SUCCESS_FORE);
             int gold = 0;
