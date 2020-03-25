@@ -5,7 +5,7 @@
 2. Open the `Trurene RPG` folder inside the outer folder (with the same name). Then right click the `Trurene RPG.csproj` file and open with Notepad or other text editing program (NOT visual studio). Scroll through the document and delete the following block of text from the file (if it is there): 
 ```
   <PropertyGroup>
-    <ManifestCertificateThumbprint>CC65C72DFFBAD6A5AA1509F70C55E7DF874ECB10</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>.....</ManifestCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup>
     <ManifestKeyFile>Trurene RPG_TemporaryKey.pfx</ManifestKeyFile>
