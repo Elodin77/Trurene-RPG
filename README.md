@@ -2,6 +2,11 @@
 
 Download the zip file **[here](https://drive.google.com/file/d/1N83e_JdJyPF9xXsPHbBKWK85RdzZC32b/view?usp=sharing)**, cloning/downloading the repository may not work.
 
+It may take some time to download:
+* Part 1 Documentation: 10000 words
+* Part 2 Documentation: 2115 words
+* Program: 2000 lines
+
 # Trurene - The RPG
 This is a game which I, DJ, have made as part of a submission for a Computer Science project. Expect bugs, errors and some incorrect information in the files contained in this repository. 
 
