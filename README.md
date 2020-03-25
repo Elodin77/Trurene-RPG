@@ -21,8 +21,8 @@ This simply removes some security stuff which would otherwise prevent Visual Stu
 
 It may take some time to download:
 * Part 1 Documentation: 10000 words
-* Part 2 Documentation: 2115 words
-* Program: 2000 lines
+* Part 2 Documentation: 2000 words
+* Program: 3000 lines
 
 # Trurene - The RPG
 This is a game which I, DJ, have made as part of a submission for a Computer Science project. Expect bugs, errors and some incorrect information in the files contained in this repository. 
